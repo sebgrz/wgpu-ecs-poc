@@ -1,20 +1,25 @@
-use std::sync::Arc;
+use std::{cell::RefCell, ops::DerefMut, rc::Rc, sync::Arc};
 
 use winit::{
     application::ApplicationHandler,
     event::WindowEvent,
     event_loop::ActiveEventLoop,
-    platform::startup_notify::{EventLoopExtStartupNotify, WindowAttributesExtStartupNotify},
     window::{Window, WindowId},
 };
 
+use crate::renderer::{self, Renderer};
+
 pub struct WindowApplication {
     window: Option<Arc<Window>>,
+    renderer: Rc<RefCell<Renderer>>,
 }
 
 impl WindowApplication {
-    pub fn init() -> Self {
-        Self { window: None }
+    pub fn init(renderer: Rc<RefCell<Renderer>>) -> Self {
+        Self {
+            window: None,
+            renderer: renderer,
+        }
     }
 
     fn create_window(&mut self, event_loop: &ActiveEventLoop) {
@@ -23,15 +28,15 @@ impl WindowApplication {
             .with_active(true)
             .with_visible(true);
 
-        {
-            use winit::platform::startup_notify;
-            if let Some(token) = event_loop.read_token_from_env() {
-                startup_notify::reset_activation_token_env();
-                attributes = attributes.with_activation_token(token);
-            }
-        }
         let window = event_loop.create_window(attributes).unwrap();
-        self.window = Some(Arc::new(window));
+        let window_shared = Arc::new(window);
+
+        self.window = Some(window_shared.clone());
+        let renderer = self.renderer.clone();
+        let mut renderer = renderer.borrow_mut();
+        renderer.create_renderer(event_loop.owned_display_handle(), window_shared.clone());
+
+        window_shared.clone().request_redraw();
     }
 }
 
@@ -46,24 +51,19 @@ impl ApplicationHandler for WindowApplication {
         window_id: WindowId,
         event: WindowEvent,
     ) {
+        let mut renderer = self.renderer.borrow_mut();
         let window = self.window.clone().unwrap();
 
         match event {
+            WindowEvent::CloseRequested => {
+                event_loop.exit();
+            },
             WindowEvent::Resized(size) => {
-                // TODO surface
                 window.request_redraw();
             }
             WindowEvent::RedrawRequested => {
-                window.pre_present_notify();
-            }
-            WindowEvent::ActivationTokenDone { token: _token, .. } => {
-                // #[cfg(any(x11_platform, wayland_platform))]
-                {
-                    use winit::platform::startup_notify;
-
-                    startup_notify::set_activation_token_env(_token);
-                    self.create_window(event_loop);
-                }
+                renderer.render();
+                window.request_redraw();
             }
             _ => {}
         }
