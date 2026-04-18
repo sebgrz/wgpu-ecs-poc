@@ -2,10 +2,9 @@ use std::{cell::RefCell, rc::Rc};
 
 use winit::event_loop::EventLoop;
 
-use crate::{renderer::Renderer, window::WindowApplication};
+use crate::core::{renderer::Renderer, window::WindowApplication};
 
-mod renderer;
-mod window;
+mod core;
 
 fn main() {
     let event_loop = EventLoop::new().unwrap();
