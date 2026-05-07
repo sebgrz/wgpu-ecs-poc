@@ -1,4 +1,4 @@
-use std::{cell::RefCell, ops::DerefMut, rc::Rc, sync::Arc};
+use std::{cell::RefCell, rc::Rc, sync::Arc};
 
 use winit::{
     application::ApplicationHandler,
@@ -7,7 +7,7 @@ use winit::{
     window::{Window, WindowId},
 };
 
-use crate::{core::renderer::Renderer};
+use crate::core::renderer::Renderer;
 
 pub struct WindowApplication {
     window: Option<Arc<Window>>,
@@ -23,7 +23,7 @@ impl WindowApplication {
     }
 
     fn create_window(&mut self, event_loop: &ActiveEventLoop) {
-        let mut attributes = Window::default_attributes()
+        let attributes = Window::default_attributes()
             .with_title("window")
             .with_active(true)
             .with_visible(true);
@@ -48,7 +48,7 @@ impl ApplicationHandler for WindowApplication {
     fn window_event(
         &mut self,
         event_loop: &ActiveEventLoop,
-        window_id: WindowId,
+        _window_id: WindowId,
         event: WindowEvent,
     ) {
         let mut renderer = self.renderer.borrow_mut();
@@ -57,8 +57,8 @@ impl ApplicationHandler for WindowApplication {
         match event {
             WindowEvent::CloseRequested => {
                 event_loop.exit();
-            },
-            WindowEvent::Resized(size) => {
+            }
+            WindowEvent::Resized(_size) => {
                 window.request_redraw();
             }
             WindowEvent::RedrawRequested => {

@@ -2,7 +2,7 @@ use std::sync::Arc;
 
 use pollster::FutureExt as _;
 use wgpu::{
-    CurrentSurfaceTexture, DeviceDescriptor, Instance, TextureViewDescriptor,
+    CurrentSurfaceTexture, Device, DeviceDescriptor, Instance, Queue, TextureViewDescriptor,
 };
 use winit::{dpi::PhysicalSize, event_loop::OwnedDisplayHandle, window::Window};
 
@@ -12,12 +12,19 @@ pub struct Renderer {
 }
 
 impl Renderer {
-    pub fn create_renderer(&mut self, display: OwnedDisplayHandle, window: Arc<Window>) {
+    pub(crate) fn create_renderer(&mut self, display: OwnedDisplayHandle, window: Arc<Window>) {
         let inner_renderer = InnerRenderer::init(display, window).block_on();
         self.inner_renderer = Some(inner_renderer);
     }
 
-    pub fn render(&mut self) {
+    pub(crate) fn borrow_device(&self) -> (&Device, &Queue) {
+        let device = &self.inner_renderer.as_ref().unwrap().device;
+        let queue = &self.inner_renderer.as_ref().unwrap().queue;
+
+        (device, queue)
+    }
+
+    pub(crate) fn render(&mut self) {
         if let Some(inner_renderer) = &mut self.inner_renderer {
             inner_renderer.render();
         }
