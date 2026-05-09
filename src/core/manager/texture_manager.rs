@@ -15,15 +15,15 @@ struct TextureObject {
     bind_group: BindGroup,
 }
 
-pub(crate) struct TextureManager<'manager> {
-    renderer: &'manager Renderer,
+pub(crate) struct TextureManager<'r> {
+    renderer: &'r Renderer,
     textures_map: HashMap<String, TextureObject>,
     texture_sampler: Sampler,
     texture_bind_group_layout: BindGroupLayout,
 }
 
-impl<'manager> TextureManager<'manager> {
-    pub(crate) fn new(renderer: &'manager Renderer) -> Self {
+impl<'r> TextureManager<'r> {
+    pub(crate) fn new(renderer: &'r Renderer) -> Self {
         let (device, _) = renderer.borrow_device();
         Self {
             renderer,
@@ -38,7 +38,7 @@ impl<'manager> TextureManager<'manager> {
     pub(crate) fn load_texture(
         &mut self,
         asset_mgr: &AssetManager,
-        texture_id: &'manager str,
+        texture_id: &str,
     ) -> Result<(), TextureManagerError> {
         let texture_id = texture_id.to_owned();
         if self.textures_map.contains_key(&texture_id) {
@@ -109,7 +109,7 @@ impl<'manager> TextureManager<'manager> {
         Ok(())
     }
 
-    pub(crate) fn unload(&mut self, texture_id: &'manager str) -> Result<(), TextureManagerError> {
+    pub(crate) fn unload(&mut self, texture_id: &str) -> Result<(), TextureManagerError> {
         if self.textures_map.contains_key(texture_id).not() {
             return Err(format!("texture {} is not exists", texture_id));
         }
