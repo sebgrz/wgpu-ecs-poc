@@ -15,7 +15,9 @@ fn main() {
     let renderer = Renderer::default();
     let asset_manager = AssetManager::new();
     let mut texture_manager = TextureManager::new(&renderer);
-    texture_manager.load_texture(&asset_manager, "sample_texture").unwrap();
+    texture_manager
+        .load_texture(&asset_manager, "sample_texture")
+        .unwrap();
 
     let mut app = WindowApplication::init(Rc::new(RefCell::new(renderer)));
     event_loop.run_app(&mut app).unwrap();

@@ -1,4 +1,4 @@
-use std::collections::HashMap;
+use std::{collections::HashMap, ops::Not};
 
 use wgpu::{
     BindGroup, BindGroupEntry, BindGroupLayout, BindGroupLayoutEntry, Device, Extent3d, Sampler,
@@ -40,8 +40,13 @@ impl<'manager> TextureManager<'manager> {
         asset_mgr: &AssetManager,
         texture_id: &'manager str,
     ) -> Result<(), TextureManagerError> {
+        let texture_id = texture_id.to_owned();
+        if self.textures_map.contains_key(&texture_id) {
+            return Err(format!("texture {} is loaded", texture_id));
+        }
+
         let (device, queue) = self.renderer.borrow_device();
-        let bytes = asset_mgr.load_bytes(texture_id).map_err(|e| e)?;
+        let bytes = asset_mgr.load_bytes(&texture_id).map_err(|e| e)?;
 
         // create gpu texture buffer
         let texture_img = image::load_from_memory(bytes.as_slice()).unwrap();
@@ -99,8 +104,19 @@ impl<'manager> TextureManager<'manager> {
             texture: texture,
             bind_group: texture_bind_group,
         };
-        self.textures_map
-            .insert(texture_id.to_owned(), texture_object);
+        self.textures_map.insert(texture_id, texture_object);
+
+        Ok(())
+    }
+
+    pub(crate) fn unload(&mut self, texture_id: &'manager str) -> Result<(), TextureManagerError> {
+        if self.textures_map.contains_key(texture_id).not() {
+            return Err(format!("texture {} is not exists", texture_id));
+        }
+
+        let texture_obj = self.textures_map.get(texture_id).unwrap();
+        texture_obj.texture.destroy();
+        self.textures_map.remove(texture_id);
 
         Ok(())
     }
