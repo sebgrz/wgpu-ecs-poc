@@ -2,7 +2,8 @@ use std::sync::Arc;
 
 use pollster::FutureExt as _;
 use wgpu::{
-    CurrentSurfaceTexture, Device, DeviceDescriptor, Instance, Queue, TextureViewDescriptor,
+    CurrentSurfaceTexture, Device, DeviceDescriptor, Instance, Queue, TextureFormat,
+    TextureViewDescriptor,
 };
 use winit::{dpi::PhysicalSize, event_loop::OwnedDisplayHandle, window::Window};
 
@@ -22,6 +23,10 @@ impl Renderer {
         let queue = &self.inner_renderer.as_ref().unwrap().queue;
 
         (device, queue)
+    }
+
+    pub(crate) fn borrow_surface_format(&self) -> &TextureFormat {
+        &self.inner_renderer.as_ref().unwrap().surface_format
     }
 
     pub(crate) fn render(&mut self) {

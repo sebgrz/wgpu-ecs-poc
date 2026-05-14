@@ -8,7 +8,9 @@ pub(crate) enum AssetType {
         width: i32,
         height: i32,
     },
-    // TODO: music, level, so eon
+    Shader {
+        shader_str: String,
+    }, // TODO: music, level, so eon
 }
 
 pub(crate) struct AssetManager {

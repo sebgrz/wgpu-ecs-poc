@@ -3,7 +3,10 @@ use std::{cell::RefCell, rc::Rc};
 use winit::event_loop::EventLoop;
 
 use crate::core::{
-    manager::{asset_manager::AssetManager, texture_manager::TextureManager},
+    manager::{
+        asset_manager::AssetManager, pipeline_manager::PipelineManager,
+        texture_manager::TextureManager,
+    },
     renderer::Renderer,
     window::WindowApplication,
 };
@@ -17,6 +20,16 @@ fn main() {
     let mut texture_manager = TextureManager::new(&renderer);
     texture_manager
         .load_texture(&asset_manager, "sample_texture")
+        .unwrap();
+
+    let mut pipeline_manager = PipelineManager::new(&renderer);
+    pipeline_manager
+        .create_pipeline(
+            "reneder_pipeline_id",
+            "sprite_shader",
+            &asset_manager,
+            vec![],
+        )
         .unwrap();
 
     let mut app = WindowApplication::init(Rc::new(RefCell::new(renderer)));

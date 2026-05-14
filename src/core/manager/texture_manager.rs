@@ -46,7 +46,7 @@ impl<'r> TextureManager<'r> {
         }
 
         let (device, queue) = self.renderer.borrow_device();
-        let bytes = asset_mgr.load_bytes(&texture_id).map_err(|e| e)?;
+        let bytes = asset_mgr.load_bytes(&texture_id)?;
 
         // create gpu texture buffer
         let texture_img = image::load_from_memory(bytes.as_slice()).unwrap();
@@ -119,6 +119,10 @@ impl<'r> TextureManager<'r> {
         self.textures_map.remove(texture_id);
 
         Ok(())
+    }
+
+    pub(crate) fn borrow_bind_group_layout(&self) -> &BindGroupLayout {
+        &self.texture_bind_group_layout
     }
 
     fn create_sampler(device: &Device) -> Sampler {
