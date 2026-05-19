@@ -1,0 +1,8 @@
+[package]
+name = "wgpu_app"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+wgpu_core = { path = "../core" }
+winit = { workspace = true }

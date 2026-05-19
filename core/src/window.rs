@@ -7,7 +7,7 @@ use winit::{
     window::{Window, WindowId},
 };
 
-use crate::core::renderer::Renderer;
+use crate::renderer::Renderer;
 
 pub struct WindowApplication {
     window: Option<Arc<Window>>,

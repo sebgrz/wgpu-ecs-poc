@@ -2,7 +2,7 @@ use std::{cell::RefCell, rc::Rc};
 
 use winit::event_loop::EventLoop;
 
-use crate::core::{
+use wgpu_core::{
     manager::{
         asset_manager::AssetManager, pipeline_manager::PipelineManager,
         texture_manager::TextureManager,
@@ -10,8 +10,6 @@ use crate::core::{
     renderer::Renderer,
     window::WindowApplication,
 };
-
-mod core;
 
 fn main() {
     let event_loop = EventLoop::new().unwrap();

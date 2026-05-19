@@ -1,8 +1,8 @@
 use std::{collections::HashMap, fs::File, io::Read, ops::Not};
 
-pub(crate) type Error = String;
+pub type Error = String;
 
-pub(crate) enum AssetType {
+pub enum AssetType {
     Texture {
         path: String,
         width: i32,
@@ -13,18 +13,18 @@ pub(crate) enum AssetType {
     }, // TODO: music, level, so eon
 }
 
-pub(crate) struct AssetManager {
+pub struct AssetManager {
     assets_map: HashMap<String, AssetType>,
 }
 
 impl AssetManager {
-    pub(crate) fn new() -> Self {
+    pub fn new() -> Self {
         Self {
             assets_map: HashMap::new(),
         }
     }
 
-    pub(crate) fn add(&mut self, asset_id: &str, asset: AssetType) -> Result<(), Error> {
+    pub fn add(&mut self, asset_id: &str, asset: AssetType) -> Result<(), Error> {
         if self.assets_map.contains_key(asset_id) {
             return Err("asset_id exists".to_string());
         }
@@ -34,7 +34,7 @@ impl AssetManager {
         Ok(())
     }
 
-    pub(crate) fn load_bytes(&self, asset_id: &str) -> Result<Vec<u8>, Error> {
+    pub fn load_bytes(&self, asset_id: &str) -> Result<Vec<u8>, Error> {
         if self.assets_map.contains_key(asset_id).not() {
             return Err("asset_id is not exists".to_string());
         }

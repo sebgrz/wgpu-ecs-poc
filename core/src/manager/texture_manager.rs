@@ -6,16 +6,16 @@ use wgpu::{
     TextureFormat, TextureUsages, TextureViewDescriptor,
 };
 
-use crate::core::{manager::asset_manager::AssetManager, renderer::Renderer};
+use crate::{manager::asset_manager::AssetManager, renderer::Renderer};
 
-pub(crate) type TextureManagerError = String;
+pub type TextureManagerError = String;
 
 struct TextureObject {
     texture: Texture,
     bind_group: BindGroup,
 }
 
-pub(crate) struct TextureManager<'r> {
+pub struct TextureManager<'r> {
     renderer: &'r Renderer,
     textures_map: HashMap<String, TextureObject>,
     texture_sampler: Sampler,
@@ -23,7 +23,7 @@ pub(crate) struct TextureManager<'r> {
 }
 
 impl<'r> TextureManager<'r> {
-    pub(crate) fn new(renderer: &'r Renderer) -> Self {
+    pub fn new(renderer: &'r Renderer) -> Self {
         let (device, _) = renderer.borrow_device();
         Self {
             renderer,
@@ -35,7 +35,7 @@ impl<'r> TextureManager<'r> {
 
     // TODO
     // 3. unloader
-    pub(crate) fn load_texture(
+    pub fn load_texture(
         &mut self,
         asset_mgr: &AssetManager,
         texture_id: &str,
@@ -109,7 +109,7 @@ impl<'r> TextureManager<'r> {
         Ok(())
     }
 
-    pub(crate) fn unload(&mut self, texture_id: &str) -> Result<(), TextureManagerError> {
+    pub fn unload(&mut self, texture_id: &str) -> Result<(), TextureManagerError> {
         if self.textures_map.contains_key(texture_id).not() {
             return Err(format!("texture {} is not exists", texture_id));
         }

@@ -2,24 +2,24 @@ use std::{borrow::Cow, collections::HashMap, str};
 
 use wgpu::{BindGroupLayout, RenderPipeline};
 
-use crate::core::{manager::asset_manager::AssetManager, renderer::Renderer};
+use crate::{manager::asset_manager::AssetManager, renderer::Renderer};
 
-pub(crate) type PipelineManagerError = String;
+pub type PipelineManagerError = String;
 
-pub(crate) struct PipelineManager<'r> {
+pub struct PipelineManager<'r> {
     renderer: &'r Renderer,
     pipelines_map: HashMap<String, RenderPipeline>,
 }
 
 impl<'r> PipelineManager<'r> {
-    pub(crate) fn new(renderer: &'r Renderer) -> Self {
+    pub fn new(renderer: &'r Renderer) -> Self {
         Self {
             renderer,
             pipelines_map: HashMap::new(),
         }
     }
 
-    pub(crate) fn create_pipeline(
+    pub fn create_pipeline(
         &mut self,
         pipeline_id: &str,
         shader_id: &str,
