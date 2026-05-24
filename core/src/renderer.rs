@@ -1,4 +1,4 @@
-use std::sync::Arc;
+use std::{cell::RefCell, rc::Rc, sync::Arc};
 
 use pollster::FutureExt as _;
 use wgpu::{
@@ -6,6 +6,8 @@ use wgpu::{
     TextureViewDescriptor,
 };
 use winit::{dpi::PhysicalSize, event_loop::OwnedDisplayHandle, window::Window};
+
+pub type SharedRenderer = Rc<RefCell<Renderer>>;
 
 #[derive(Default)]
 pub struct Renderer {

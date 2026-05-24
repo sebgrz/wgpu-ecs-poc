@@ -1,18 +1,18 @@
-use std::{borrow::Cow, collections::HashMap, str};
+use std::{borrow::Cow, collections::HashMap, rc::Rc, str};
 
 use wgpu::{BindGroupLayout, RenderPipeline};
 
-use crate::{manager::asset_manager::AssetManager, renderer::Renderer};
+use crate::{manager::asset_manager::AssetManager, renderer::{Renderer, SharedRenderer}};
 
 pub type PipelineManagerError = String;
 
-pub struct PipelineManager<'r> {
-    renderer: &'r Renderer,
+pub struct PipelineManager {
+    renderer: SharedRenderer,
     pipelines_map: HashMap<String, RenderPipeline>,
 }
 
-impl<'r> PipelineManager<'r> {
-    pub fn new(renderer: &'r Renderer) -> Self {
+impl<'r> PipelineManager {
+    pub fn new(renderer: SharedRenderer) -> Self {
         Self {
             renderer,
             pipelines_map: HashMap::new(),
@@ -28,8 +28,9 @@ impl<'r> PipelineManager<'r> {
     ) -> Result<(), PipelineManagerError> {
         let optional_bind_group_layouts: Vec<Option<&BindGroupLayout>> =
             bind_group_layouts.into_iter().map(Some).collect();
-        let surface_format = self.renderer.borrow_surface_format();
-        let (device, _) = self.renderer.borrow_device();
+        let renderer = self.renderer.borrow();
+        let surface_format = renderer.borrow_surface_format();
+        let (device, _) = renderer.borrow_device();
         let pipeline_layout = device.create_pipeline_layout(&wgpu::PipelineLayoutDescriptor {
             label: Some(format!("{}_pipeline_layout", pipeline_id).as_ref()),
             bind_group_layouts: &optional_bind_group_layouts.as_slice(),

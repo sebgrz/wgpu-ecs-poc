@@ -13,15 +13,15 @@ use wgpu_core::{
 
 fn main() {
     let event_loop = EventLoop::new().unwrap();
-    let renderer = Renderer::default();
+    let renderer = Rc::new(RefCell::new(Renderer::default()));
     let asset_manager = AssetManager::new();
-    let _buffer_manager = UniformBufferManager::new(&renderer);
-    let mut texture_manager = TextureManager::new(&renderer);
+    let _buffer_manager = UniformBufferManager::new(renderer.clone());
+    let mut texture_manager = TextureManager::new(renderer.clone());
     texture_manager
         .load_texture(&asset_manager, "sample_texture")
         .unwrap();
 
-    let mut pipeline_manager = PipelineManager::new(&renderer);
+    let mut pipeline_manager = PipelineManager::new(renderer.clone());
     pipeline_manager
         .create_pipeline(
             "reneder_pipeline_id",
@@ -31,6 +31,6 @@ fn main() {
         )
         .unwrap();
 
-    let mut app = WindowApplication::init(Rc::new(RefCell::new(renderer)));
+    let mut app = WindowApplication::init(renderer.clone());
     event_loop.run_app(&mut app).unwrap();
 }

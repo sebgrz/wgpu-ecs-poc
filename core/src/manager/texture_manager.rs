@@ -1,4 +1,4 @@
-use std::{collections::HashMap, ops::Not};
+use std::{cell::RefCell, collections::HashMap, ops::Not, rc::Rc};
 
 use wgpu::{
     BindGroup, BindGroupEntry, BindGroupLayout, BindGroupLayoutEntry, Device, Extent3d, Sampler,
@@ -6,35 +6,38 @@ use wgpu::{
     TextureFormat, TextureUsages, TextureViewDescriptor,
 };
 
-use crate::{manager::asset_manager::AssetManager, renderer::Renderer};
+use crate::{
+    manager::asset_manager::AssetManager,
+    renderer::{Renderer, SharedRenderer},
+};
 
 pub type TextureManagerError = String;
 
-struct TextureObject {
-    texture: Texture,
-    bind_group: BindGroup,
+pub(crate) struct TextureObject {
+    pub(crate) size: (u32, u32),
+    pub(crate) texture: Texture,
+    pub(crate) bind_group: BindGroup,
 }
 
-pub struct TextureManager<'r> {
-    renderer: &'r Renderer,
+pub struct TextureManager {
+    renderer: SharedRenderer,
     textures_map: HashMap<String, TextureObject>,
     texture_sampler: Sampler,
     texture_bind_group_layout: BindGroupLayout,
 }
 
-impl<'r> TextureManager<'r> {
-    pub fn new(renderer: &'r Renderer) -> Self {
-        let (device, _) = renderer.borrow_device();
+impl TextureManager {
+    pub fn new(renderer: SharedRenderer) -> Self {
+        let rendered_borrow = renderer.borrow();
+        let (device, _) = rendered_borrow.borrow_device();
         Self {
-            renderer,
+            renderer: renderer.clone(),
             textures_map: HashMap::new(),
             texture_sampler: Self::create_sampler(device),
             texture_bind_group_layout: Self::create_bind_group_layout(device),
         }
     }
 
-    // TODO
-    // 3. unloader
     pub fn load_texture(
         &mut self,
         asset_mgr: &AssetManager,
@@ -44,8 +47,8 @@ impl<'r> TextureManager<'r> {
         if self.textures_map.contains_key(&texture_id) {
             return Err(format!("texture {} is loaded", texture_id));
         }
-
-        let (device, queue) = self.renderer.borrow_device();
+        let renderer = self.renderer.borrow();
+        let (device, queue) = renderer.borrow_device();
         let bytes = asset_mgr.load_bytes(&texture_id)?;
 
         // create gpu texture buffer
@@ -101,12 +104,18 @@ impl<'r> TextureManager<'r> {
         });
 
         let texture_object = TextureObject {
+            size: texture_img_rgba.dimensions(),
             texture: texture,
             bind_group: texture_bind_group,
         };
         self.textures_map.insert(texture_id, texture_object);
 
         Ok(())
+    }
+
+    pub(crate) fn borrow_object(&self, texture_id: &str) -> &TextureObject {
+        let texture_obj = self.textures_map.get(texture_id).unwrap();
+        texture_obj
     }
 
     pub fn unload(&mut self, texture_id: &str) -> Result<(), TextureManagerError> {

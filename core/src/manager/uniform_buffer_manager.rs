@@ -1,22 +1,22 @@
-use std::collections::HashMap;
+use std::{cell::RefCell, collections::HashMap, rc::Rc};
 
 use bytemuck::Pod;
 use wgpu::{BindGroup, BindGroupEntry, BindGroupLayoutEntry, Buffer, BufferUsages, ShaderStages};
 
-use crate::renderer::Renderer;
+use crate::renderer::{Renderer, SharedRenderer};
 
 struct UniformBufferObject {
     buffer: Buffer,
     bind_group: BindGroup,
 }
 
-pub struct UniformBufferManager<'r> {
-    renderer: &'r Renderer,
+pub struct UniformBufferManager {
+    renderer: SharedRenderer,
     buffers_map: HashMap<String, UniformBufferObject>,
 }
 
-impl<'r> UniformBufferManager<'r> {
-    pub fn new(renderer: &'r Renderer) -> Self {
+impl<'r> UniformBufferManager {
+    pub fn new(renderer: SharedRenderer) -> Self {
         Self {
             renderer,
             buffers_map: HashMap::new(),
@@ -24,7 +24,8 @@ impl<'r> UniformBufferManager<'r> {
     }
 
     pub fn create<T>(&mut self, buffer_id: &str, items: u64) {
-        let (device, _) = self.renderer.borrow_device();
+        let renderer = self.renderer.borrow();
+        let (device, _) = renderer.borrow_device();
         let uniform_bind_group_layout =
             device.create_bind_group_layout(&wgpu::BindGroupLayoutDescriptor {
                 entries: &[BindGroupLayoutEntry {
@@ -73,7 +74,8 @@ impl<'r> UniformBufferManager<'r> {
         T: Pod,
     {
         let uniform_buffer_object = self.buffers_map.get(buffer_id).unwrap();
-        let (_, queue) = self.renderer.borrow_device();
+        let renderer = self.renderer.borrow();
+        let (_, queue) = renderer.borrow_device();
         queue.write_buffer(&uniform_buffer_object.buffer, 0, &bytemuck::cast_vec(data));
     }
 
@@ -83,7 +85,8 @@ impl<'r> UniformBufferManager<'r> {
     {
         let size = size_of::<T>() as u64;
         let uniform_buffer_object = self.buffers_map.get(buffer_id).unwrap();
-        let (_, queue) = self.renderer.borrow_device();
+        let renderer = self.renderer.borrow();
+        let (_, queue) = renderer.borrow_device();
         queue.write_buffer(
             &uniform_buffer_object.buffer,
             size * index,
