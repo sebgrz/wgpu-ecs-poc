@@ -5,7 +5,7 @@ use winit::event_loop::EventLoop;
 use wgpu_core::{
     manager::{
         asset_manager::AssetManager, pipeline_manager::PipelineManager,
-        texture_manager::TextureManager,
+        texture_manager::TextureManager, uniform_buffer_manager::UniformBufferManager,
     },
     renderer::Renderer,
     window::WindowApplication,
@@ -15,6 +15,7 @@ fn main() {
     let event_loop = EventLoop::new().unwrap();
     let renderer = Renderer::default();
     let asset_manager = AssetManager::new();
+    let _buffer_manager = UniformBufferManager::new(&renderer);
     let mut texture_manager = TextureManager::new(&renderer);
     texture_manager
         .load_texture(&asset_manager, "sample_texture")
