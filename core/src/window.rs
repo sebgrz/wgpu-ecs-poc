@@ -7,15 +7,15 @@ use winit::{
     window::{Window, WindowId},
 };
 
-use crate::renderer::Renderer;
+use crate::renderer::{Renderer, SharedRenderer};
 
 pub struct WindowApplication {
     window: Option<Arc<Window>>,
-    renderer: Rc<RefCell<Renderer>>,
+    renderer: SharedRenderer,
 }
 
 impl WindowApplication {
-    pub fn init(renderer: Rc<RefCell<Renderer>>) -> Self {
+    pub fn init(renderer: SharedRenderer) -> Self {
         Self {
             window: None,
             renderer: renderer,
@@ -33,7 +33,7 @@ impl WindowApplication {
 
         self.window = Some(window_shared.clone());
         let renderer = self.renderer.clone();
-        let mut renderer = renderer.borrow_mut();
+        let mut renderer = renderer.lock().unwrap();
         renderer.create_renderer(event_loop.owned_display_handle(), window_shared.clone());
 
         window_shared.clone().request_redraw();
@@ -51,7 +51,7 @@ impl ApplicationHandler for WindowApplication {
         _window_id: WindowId,
         event: WindowEvent,
     ) {
-        let mut renderer = self.renderer.borrow_mut();
+        let mut renderer = self.renderer.lock().unwrap();
         let window = self.window.clone().unwrap();
 
         match event {

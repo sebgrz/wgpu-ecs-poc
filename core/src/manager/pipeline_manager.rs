@@ -2,7 +2,10 @@ use std::{borrow::Cow, collections::HashMap, rc::Rc, str};
 
 use wgpu::{BindGroupLayout, RenderPipeline};
 
-use crate::{manager::asset_manager::AssetManager, renderer::{Renderer, SharedRenderer}};
+use crate::{
+    manager::asset_manager::AssetManager,
+    renderer::{Renderer, SharedRenderer},
+};
 
 pub type PipelineManagerError = String;
 
@@ -28,7 +31,7 @@ impl<'r> PipelineManager {
     ) -> Result<(), PipelineManagerError> {
         let optional_bind_group_layouts: Vec<Option<&BindGroupLayout>> =
             bind_group_layouts.into_iter().map(Some).collect();
-        let renderer = self.renderer.borrow();
+        let renderer = self.renderer.lock().unwrap();
         let surface_format = renderer.borrow_surface_format();
         let (device, _) = renderer.borrow_device();
         let pipeline_layout = device.create_pipeline_layout(&wgpu::PipelineLayoutDescriptor {

@@ -1,4 +1,10 @@
-use std::{cell::RefCell, collections::HashMap, ops::Not, rc::Rc};
+use std::{
+    cell::RefCell,
+    collections::HashMap,
+    ops::Not,
+    rc::Rc,
+    sync::{Arc, Mutex},
+};
 
 use wgpu::{
     BindGroup, BindGroupEntry, BindGroupLayout, BindGroupLayoutEntry, Device, Extent3d, Sampler,
@@ -12,6 +18,7 @@ use crate::{
 };
 
 pub type TextureManagerError = String;
+pub type SharedTextureManager = Arc<Mutex<TextureManager>>;
 
 pub(crate) struct TextureObject {
     pub(crate) size: (u32, u32),
@@ -28,7 +35,7 @@ pub struct TextureManager {
 
 impl TextureManager {
     pub fn new(renderer: SharedRenderer) -> Self {
-        let rendered_borrow = renderer.borrow();
+        let rendered_borrow = renderer.lock().unwrap();
         let (device, _) = rendered_borrow.borrow_device();
         Self {
             renderer: renderer.clone(),
@@ -47,7 +54,7 @@ impl TextureManager {
         if self.textures_map.contains_key(&texture_id) {
             return Err(format!("texture {} is loaded", texture_id));
         }
-        let renderer = self.renderer.borrow();
+        let renderer = self.renderer.lock().unwrap();
         let (device, queue) = renderer.borrow_device();
         let bytes = asset_mgr.load_bytes(&texture_id)?;
 

@@ -1,4 +1,8 @@
-use std::{cell::RefCell, rc::Rc, sync::Arc};
+use std::{
+    cell::RefCell,
+    rc::Rc,
+    sync::{Arc, Mutex},
+};
 
 use pollster::FutureExt as _;
 use wgpu::{
@@ -7,7 +11,7 @@ use wgpu::{
 };
 use winit::{dpi::PhysicalSize, event_loop::OwnedDisplayHandle, window::Window};
 
-pub type SharedRenderer = Rc<RefCell<Renderer>>;
+pub type SharedRenderer = Arc<Mutex<Renderer>>;
 
 #[derive(Default)]
 pub struct Renderer {

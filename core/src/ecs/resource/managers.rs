@@ -1,7 +1,8 @@
 use std::rc::Rc;
 
-use crate::manager::texture_manager::TextureManager;
+use crate::manager::texture_manager::{SharedTextureManager, TextureManager};
 
-pub struct Managers {
-    texture_manager: Rc<TextureManager>,
+#[derive(Default)]
+pub struct ManagersResource {
+    texture_manager: Option<SharedTextureManager>,
 }
