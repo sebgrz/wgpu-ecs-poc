@@ -1,7 +1,7 @@
 use std::{
     cell::RefCell,
     rc::Rc,
-    sync::{Arc, Mutex},
+    sync::{Arc, Mutex, RwLock},
 };
 
 use pollster::FutureExt as _;
@@ -11,7 +11,7 @@ use wgpu::{
 };
 use winit::{dpi::PhysicalSize, event_loop::OwnedDisplayHandle, window::Window};
 
-pub type SharedRenderer = Arc<Mutex<Renderer>>;
+pub type SharedRenderer = Arc<RwLock<Renderer>>;
 
 #[derive(Default)]
 pub struct Renderer {
@@ -35,8 +35,8 @@ impl Renderer {
         &self.inner_renderer.as_ref().unwrap().surface_format
     }
 
-    pub(crate) fn render(&mut self) {
-        if let Some(inner_renderer) = &mut self.inner_renderer {
+    pub(crate) fn render(&self) {
+        if let Some(inner_renderer) = &self.inner_renderer {
             inner_renderer.render();
         }
     }
@@ -96,7 +96,7 @@ impl InnerRenderer {
         self.surface.configure(&self.device, &surface_config);
     }
 
-    fn render(&mut self) {
+    fn render(&self) {
         if let CurrentSurfaceTexture::Success(surface_texture) = self.surface.get_current_texture()
         {
             let texture_view = surface_texture.texture.create_view(&TextureViewDescriptor {

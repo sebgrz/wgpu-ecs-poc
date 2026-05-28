@@ -33,7 +33,7 @@ impl WindowApplication {
 
         self.window = Some(window_shared.clone());
         let renderer = self.renderer.clone();
-        let mut renderer = renderer.lock().unwrap();
+        let mut renderer = renderer.write().unwrap();
         renderer.create_renderer(event_loop.owned_display_handle(), window_shared.clone());
 
         window_shared.clone().request_redraw();
@@ -51,7 +51,7 @@ impl ApplicationHandler for WindowApplication {
         _window_id: WindowId,
         event: WindowEvent,
     ) {
-        let mut renderer = self.renderer.lock().unwrap();
+        let renderer = self.renderer.read().unwrap();
         let window = self.window.clone().unwrap();
 
         match event {

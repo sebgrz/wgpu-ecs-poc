@@ -31,7 +31,7 @@ impl<'r> PipelineManager {
     ) -> Result<(), PipelineManagerError> {
         let optional_bind_group_layouts: Vec<Option<&BindGroupLayout>> =
             bind_group_layouts.into_iter().map(Some).collect();
-        let renderer = self.renderer.lock().unwrap();
+        let renderer = self.renderer.read().unwrap();
         let surface_format = renderer.borrow_surface_format();
         let (device, _) = renderer.borrow_device();
         let pipeline_layout = device.create_pipeline_layout(&wgpu::PipelineLayoutDescriptor {

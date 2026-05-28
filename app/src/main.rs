@@ -1,4 +1,4 @@
-use std::sync::{Arc, Mutex};
+use std::sync::{Arc, RwLock};
 
 use winit::event_loop::EventLoop;
 
@@ -13,7 +13,7 @@ use wgpu_core::{
 
 fn main() {
     let event_loop = EventLoop::new().unwrap();
-    let renderer = Arc::new(Mutex::new(Renderer::default()));
+    let renderer = Arc::new(RwLock::new(Renderer::default()));
     let asset_manager = AssetManager::new();
     let _buffer_manager = UniformBufferManager::new(renderer.clone());
     let mut texture_manager = TextureManager::new(renderer.clone());

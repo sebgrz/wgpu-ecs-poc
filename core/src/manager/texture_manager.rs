@@ -3,7 +3,7 @@ use std::{
     collections::HashMap,
     ops::Not,
     rc::Rc,
-    sync::{Arc, Mutex},
+    sync::{Arc, Mutex, RwLock},
 };
 
 use wgpu::{
@@ -18,7 +18,7 @@ use crate::{
 };
 
 pub type TextureManagerError = String;
-pub type SharedTextureManager = Arc<Mutex<TextureManager>>;
+pub type SharedTextureManager = Arc<RwLock<TextureManager>>;
 
 pub(crate) struct TextureObject {
     pub(crate) size: (u32, u32),
@@ -29,17 +29,19 @@ pub(crate) struct TextureObject {
 pub struct TextureManager {
     renderer: SharedRenderer,
     textures_map: HashMap<String, TextureObject>,
+    textures_size_cache_map: HashMap<String, (u32, u32)>,
     texture_sampler: Sampler,
     texture_bind_group_layout: BindGroupLayout,
 }
 
 impl TextureManager {
     pub fn new(renderer: SharedRenderer) -> Self {
-        let rendered_borrow = renderer.lock().unwrap();
+        let rendered_borrow = renderer.read().unwrap();
         let (device, _) = rendered_borrow.borrow_device();
         Self {
             renderer: renderer.clone(),
             textures_map: HashMap::new(),
+            textures_size_cache_map: HashMap::new(),
             texture_sampler: Self::create_sampler(device),
             texture_bind_group_layout: Self::create_bind_group_layout(device),
         }
@@ -54,7 +56,7 @@ impl TextureManager {
         if self.textures_map.contains_key(&texture_id) {
             return Err(format!("texture {} is loaded", texture_id));
         }
-        let renderer = self.renderer.lock().unwrap();
+        let renderer = self.renderer.read().unwrap();
         let (device, queue) = renderer.borrow_device();
         let bytes = asset_mgr.load_bytes(&texture_id)?;
 
@@ -115,7 +117,13 @@ impl TextureManager {
             texture: texture,
             bind_group: texture_bind_group,
         };
-        self.textures_map.insert(texture_id, texture_object);
+
+        self.textures_size_cache_map
+            .entry(texture_id.to_string())
+            .or_insert(texture_object.size.clone());
+        self.textures_map
+            .entry(texture_id.to_string())
+            .or_insert(texture_object);
 
         Ok(())
     }
@@ -123,6 +131,10 @@ impl TextureManager {
     pub(crate) fn borrow_object(&self, texture_id: &str) -> &TextureObject {
         let texture_obj = self.textures_map.get(texture_id).unwrap();
         texture_obj
+    }
+
+    pub(crate) fn borrow_size_cache(&self, texture_id: &str) -> Option<&(u32, u32)> {
+        self.textures_size_cache_map.get(texture_id)
     }
 
     pub fn unload(&mut self, texture_id: &str) -> Result<(), TextureManagerError> {

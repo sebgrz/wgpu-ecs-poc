@@ -24,7 +24,7 @@ impl<'r> UniformBufferManager {
     }
 
     pub fn create<T>(&mut self, buffer_id: &str, items: u64) {
-        let renderer = self.renderer.lock().unwrap();
+        let renderer = self.renderer.read().unwrap();
         let (device, _) = renderer.borrow_device();
         let uniform_bind_group_layout =
             device.create_bind_group_layout(&wgpu::BindGroupLayoutDescriptor {
@@ -74,7 +74,7 @@ impl<'r> UniformBufferManager {
         T: Pod,
     {
         let uniform_buffer_object = self.buffers_map.get(buffer_id).unwrap();
-        let renderer = self.renderer.lock().unwrap();
+        let renderer = self.renderer.read().unwrap();
         let (_, queue) = renderer.borrow_device();
         queue.write_buffer(&uniform_buffer_object.buffer, 0, &bytemuck::cast_vec(data));
     }
@@ -85,7 +85,7 @@ impl<'r> UniformBufferManager {
     {
         let size = size_of::<T>() as u64;
         let uniform_buffer_object = self.buffers_map.get(buffer_id).unwrap();
-        let renderer = self.renderer.lock().unwrap();
+        let renderer = self.renderer.read().unwrap();
         let (_, queue) = renderer.borrow_device();
         queue.write_buffer(
             &uniform_buffer_object.buffer,
