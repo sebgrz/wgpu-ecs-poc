@@ -1,9 +1,9 @@
-use std::{cell::RefCell, collections::HashMap, rc::Rc};
+use std::collections::HashMap;
 
 use bytemuck::Pod;
 use wgpu::{BindGroup, BindGroupEntry, BindGroupLayoutEntry, Buffer, BufferUsages, ShaderStages};
 
-use crate::renderer::{Renderer, SharedRenderer};
+use crate::renderer::SharedRenderer;
 
 struct UniformBufferObject {
     buffer: Buffer,

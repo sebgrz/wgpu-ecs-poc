@@ -1,6 +1,6 @@
 use bytemuck::{Pod, Zeroable};
 
-#[derive(Copy, Clone, Pod, Zeroable)]
+#[derive(Default, Copy, Clone, Pod, Zeroable)]
 #[repr(C)]
 pub struct Sprite {
     pub x: i32,

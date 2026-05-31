@@ -1,9 +1,7 @@
 use std::{
-    cell::RefCell,
     collections::HashMap,
     ops::Not,
-    rc::Rc,
-    sync::{Arc, Mutex, RwLock},
+    sync::{Arc, RwLock},
 };
 
 use wgpu::{
@@ -14,7 +12,7 @@ use wgpu::{
 
 use crate::{
     manager::asset_manager::AssetManager,
-    renderer::{Renderer, SharedRenderer},
+    renderer::SharedRenderer,
 };
 
 pub type TextureManagerError = String;

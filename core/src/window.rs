@@ -1,4 +1,4 @@
-use std::{cell::RefCell, rc::Rc, sync::Arc};
+use std::sync::Arc;
 
 use winit::{
     application::ApplicationHandler,
@@ -7,7 +7,7 @@ use winit::{
     window::{Window, WindowId},
 };
 
-use crate::renderer::{Renderer, SharedRenderer};
+use crate::renderer::SharedRenderer;
 
 pub struct WindowApplication {
     window: Option<Arc<Window>>,

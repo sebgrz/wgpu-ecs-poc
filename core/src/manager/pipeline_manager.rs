@@ -1,10 +1,10 @@
-use std::{borrow::Cow, collections::HashMap, rc::Rc, str};
+use std::{borrow::Cow, collections::HashMap, str};
 
 use wgpu::{BindGroupLayout, RenderPipeline};
 
 use crate::{
     manager::asset_manager::AssetManager,
-    renderer::{Renderer, SharedRenderer},
+    renderer::SharedRenderer,
 };
 
 pub type PipelineManagerError = String;
