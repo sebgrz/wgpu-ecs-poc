@@ -10,10 +10,7 @@ use wgpu::{
     TextureFormat, TextureUsages, TextureViewDescriptor,
 };
 
-use crate::{
-    manager::asset_manager::AssetManager,
-    renderer::SharedRenderer,
-};
+use crate::{manager::asset_manager::AssetManager, renderer::SharedRenderer};
 
 pub type TextureManagerError = String;
 pub type SharedTextureManager = Arc<RwLock<TextureManager>>;

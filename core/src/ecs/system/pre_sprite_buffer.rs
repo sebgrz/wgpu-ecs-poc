@@ -21,12 +21,9 @@ impl<'a> System<'a> for PreSpriteBuffer {
     fn run(&mut self, data: Self::SystemData) {
         use specs::Join;
         let (managers_res, mut sprites_buffer_res, position, tile) = data;
-        let tex_manager = managers_res
-            .texture_manager
-            .as_ref()
-            .unwrap()
-            .read()
-            .unwrap();
+        let (arc_tex_manager, _) = managers_res.get_managers().unwrap();
+        let tex_manager = arc_tex_manager.read().unwrap();
+
         let mut count = 0;
         for (position, tile) in (&position, &tile).join() {
             println!("sprite: {:?} {:?}", position, tile);
@@ -34,7 +31,7 @@ impl<'a> System<'a> for PreSpriteBuffer {
                 let sprite = Sprite {
                     x: position.x,
                     y: position.y,
-                    width: 100, // TODO
+                    width: 100,  // TODO
                     height: 100, // TODO
                     texture_clip: tile.into_tex_dimensions(size.clone()),
                 };

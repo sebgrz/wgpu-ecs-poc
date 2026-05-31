@@ -1,9 +1,14 @@
-use std::collections::HashMap;
+use std::{
+    collections::HashMap,
+    sync::{Arc, RwLock},
+};
 
 use bytemuck::Pod;
 use wgpu::{BindGroup, BindGroupEntry, BindGroupLayoutEntry, Buffer, BufferUsages, ShaderStages};
 
 use crate::renderer::SharedRenderer;
+
+pub type SharedUniformBufferManager = Arc<RwLock<UniformBufferManager>>;
 
 struct UniformBufferObject {
     buffer: Buffer,
