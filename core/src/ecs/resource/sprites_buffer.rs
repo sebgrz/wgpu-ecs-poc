@@ -4,7 +4,7 @@ use crate::uniform::sprite::Sprite;
 
 pub struct SpritesBufferResource {
     pub sprites: [Sprite; 1024],
-    pub size: u32,
+    pub size: usize,
 }
 
 impl Default for SpritesBufferResource {

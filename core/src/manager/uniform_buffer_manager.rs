@@ -99,6 +99,14 @@ impl<'r> UniformBufferManager {
         );
     }
 
+    pub fn borrow_bind_group(&self, buffer_id: &str) -> Option<&BindGroup> {
+        let uniform_buffer_object = self.buffers_map.get(buffer_id);
+        if uniform_buffer_object.is_none() {
+            return None;
+        }
+        Some(&uniform_buffer_object.unwrap().bind_group)
+    }
+
     pub fn cleanup(&mut self, buffer_id: &str) {
         let uniform_buffer_object = self.buffers_map.get(buffer_id).unwrap();
         uniform_buffer_object.buffer.destroy();

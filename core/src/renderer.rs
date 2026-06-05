@@ -31,6 +31,10 @@ impl Renderer {
         &self.inner_renderer.as_ref().unwrap().surface_format
     }
 
+    pub(crate) fn borrow_surface(&self) -> &wgpu::Surface<'static> {
+        &self.inner_renderer.as_ref().unwrap().surface
+    }
+
     pub(crate) fn render(&self) {
         if let Some(inner_renderer) = &self.inner_renderer {
             inner_renderer.render();
@@ -93,38 +97,6 @@ impl InnerRenderer {
     }
 
     fn render(&self) {
-        if let CurrentSurfaceTexture::Success(surface_texture) = self.surface.get_current_texture()
-        {
-            let texture_view = surface_texture.texture.create_view(&TextureViewDescriptor {
-                format: Some(self.surface_format.add_srgb_suffix()),
-                ..Default::default()
-            });
-
-            let mut encoder = self.device.create_command_encoder(&Default::default());
-            let render_pass = encoder.begin_render_pass(&wgpu::RenderPassDescriptor {
-                label: None,
-                color_attachments: &[Some(wgpu::RenderPassColorAttachment {
-                    view: &texture_view,
-                    depth_slice: None,
-                    resolve_target: None,
-                    ops: wgpu::Operations {
-                        load: wgpu::LoadOp::Clear(wgpu::Color::BLUE),
-                        store: wgpu::StoreOp::Store,
-                    },
-                })],
-                depth_stencil_attachment: None,
-                timestamp_writes: None,
-                occlusion_query_set: None,
-                multiview_mask: None,
-            });
-
-            // If you wanted to call any drawing commands, they would go here.
-
-            // End the renderpass.
-            drop(render_pass);
-
-            self.queue.submit([encoder.finish()]);
-            surface_texture.present();
-        }
+        // TODO: invoke renderer system
     }
 }

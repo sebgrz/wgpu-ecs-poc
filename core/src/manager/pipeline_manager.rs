@@ -1,10 +1,16 @@
-use std::{borrow::Cow, collections::HashMap, str};
+use std::{
+    borrow::Cow,
+    collections::HashMap,
+    str,
+    sync::{Arc, RwLock},
+};
 
 use wgpu::{BindGroupLayout, RenderPipeline};
 
 use crate::{manager::asset_manager::AssetManager, renderer::SharedRenderer};
 
 pub type PipelineManagerError = String;
+pub type SharedPipelineManager = Arc<RwLock<PipelineManager>>;
 
 pub struct PipelineManager {
     renderer: SharedRenderer,
@@ -69,5 +75,9 @@ impl<'r> PipelineManager {
         self.pipelines_map
             .insert(pipeline_id.to_owned(), render_pipeline);
         Ok(())
+    }
+
+    pub fn borrow_pipeline(&self, pipeline_id: &str) -> Option<&RenderPipeline> {
+        self.pipelines_map.get(pipeline_id)
     }
 }

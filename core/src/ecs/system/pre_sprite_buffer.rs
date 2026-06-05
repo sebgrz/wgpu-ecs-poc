@@ -21,7 +21,7 @@ impl<'a> System<'a> for PreSpriteBuffer {
     fn run(&mut self, data: Self::SystemData) {
         use specs::Join;
         let (managers_res, mut sprites_buffer_res, position, tile) = data;
-        let (arc_tex_manager, _) = managers_res.get_managers().unwrap();
+        let (arc_tex_manager, _, _) = managers_res.get_managers().unwrap();
         let tex_manager = arc_tex_manager.read().unwrap();
 
         let mut count = 0;
@@ -39,5 +39,7 @@ impl<'a> System<'a> for PreSpriteBuffer {
                 count += 1;
             }
         }
+
+        sprites_buffer_res.size = count;
     }
 }
