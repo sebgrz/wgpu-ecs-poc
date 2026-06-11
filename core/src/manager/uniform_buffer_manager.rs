@@ -4,7 +4,10 @@ use std::{
 };
 
 use bytemuck::Pod;
-use wgpu::{BindGroup, BindGroupEntry, BindGroupLayoutEntry, Buffer, BufferUsages, ShaderStages};
+use wgpu::{
+    BindGroup, BindGroupEntry, BindGroupLayout, BindGroupLayoutEntry, Buffer, BufferUsages,
+    ShaderStages,
+};
 
 use crate::renderer::SharedRenderer;
 
@@ -13,6 +16,7 @@ pub type SharedUniformBufferManager = Arc<RwLock<UniformBufferManager>>;
 struct UniformBufferObject {
     buffer: Buffer,
     bind_group: BindGroup,
+    bind_group_layout: BindGroupLayout,
 }
 
 pub struct UniformBufferManager {
@@ -28,7 +32,7 @@ impl<'r> UniformBufferManager {
         }
     }
 
-    pub fn create<T>(&mut self, buffer_id: &str, items: u64) {
+    pub fn create<T>(&mut self, buffer_id: &str, items_count: u64) {
         let renderer = self.renderer.read().unwrap();
         let (device, _) = renderer.borrow_device();
         let uniform_bind_group_layout =
@@ -48,7 +52,7 @@ impl<'r> UniformBufferManager {
 
         let uniform_buffer = device.create_buffer(&wgpu::wgt::BufferDescriptor {
             label: None,
-            size: size_of::<T>() as u64 * items,
+            size: size_of::<T>() as u64 * items_count,
             usage: BufferUsages::UNIFORM | BufferUsages::COPY_DST,
             mapped_at_creation: false,
         });
@@ -69,6 +73,7 @@ impl<'r> UniformBufferManager {
         let uniform_buffer_object = UniformBufferObject {
             buffer: uniform_buffer,
             bind_group: uniform_bind_group,
+            bind_group_layout: uniform_bind_group_layout,
         };
         self.buffers_map
             .insert(buffer_id.to_owned(), uniform_buffer_object);
@@ -99,12 +104,13 @@ impl<'r> UniformBufferManager {
         );
     }
 
-    pub fn borrow_bind_group(&self, buffer_id: &str) -> Option<&BindGroup> {
+    pub fn borrow_bind_group(&self, buffer_id: &str) -> Option<(&BindGroup, &BindGroupLayout)> {
         let uniform_buffer_object = self.buffers_map.get(buffer_id);
         if uniform_buffer_object.is_none() {
             return None;
         }
-        Some(&uniform_buffer_object.unwrap().bind_group)
+        let obj = uniform_buffer_object.unwrap();
+        Some((&obj.bind_group, &obj.bind_group_layout))
     }
 
     pub fn cleanup(&mut self, buffer_id: &str) {

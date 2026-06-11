@@ -1,6 +1,13 @@
-use std::{collections::HashMap, fs::File, io::Read, ops::Not};
+use std::{
+    collections::HashMap,
+    fs::File,
+    io::Read,
+    ops::Not,
+    sync::{Arc, RwLock},
+};
 
 pub type Error = String;
+pub type SharedAssetsManager = Arc<RwLock<AssetManager>>;
 
 pub enum AssetType {
     Texture {

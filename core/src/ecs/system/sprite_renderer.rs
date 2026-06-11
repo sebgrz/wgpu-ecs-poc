@@ -20,18 +20,17 @@ impl<'a> System<'a> for SpriteRenderer {
 
     fn run(&mut self, data: Self::SystemData) {
         let (sprites_buffer_resources, managers_resource, renderer_resource) = data;
-        let (arc_tex_manager, arc_uniform_buffer_manager, arc_pipeline_manager) =
-            managers_resource.get_managers().unwrap();
-        let uniform_buffer_manager = arc_uniform_buffer_manager.read().unwrap();
-        let pipeline_manager = arc_pipeline_manager.read().unwrap();
-        let tex_manager = arc_tex_manager.read().unwrap();
+        let inner_mangers = managers_resource.get_managers().unwrap();
+        let uniform_buffer_manager = inner_mangers.uniform_buffer_manager.read().unwrap();
+        let pipeline_manager = inner_mangers.pipeline_manager.read().unwrap();
+        let tex_manager = inner_mangers.texture_manager.read().unwrap();
 
         // write sprites to gpu buffer
         let sprites = sprites_buffer_resources.sprites;
         let fragment_sprites = &sprites[0..sprites_buffer_resources.size];
         uniform_buffer_manager
             .write_from_beginning(SPRITES_BUFFER_UNIFORM, fragment_sprites.to_vec());
-        let sprites_bind_group = uniform_buffer_manager
+        let (sprites_bind_group, _) = uniform_buffer_manager
             .borrow_bind_group(SPRITES_BUFFER_UNIFORM)
             .unwrap();
 
