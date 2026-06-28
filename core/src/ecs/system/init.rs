@@ -2,7 +2,7 @@ use specs::{System, Write};
 
 use crate::{
     ecs::{resource::managers::ManagersResource, MAIN_SHADERS_ID, SPRITES_TEXTURE_ID},
-    manager::asset_manager::{self, AssetType},
+    manager::asset_manager::AssetType,
 };
 
 pub struct Init;
