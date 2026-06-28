@@ -1,9 +1,7 @@
 use std::sync::{Arc, RwLock};
 
 use pollster::FutureExt as _;
-use wgpu::{
-    Device, DeviceDescriptor, Instance, Queue, TextureFormat,
-};
+use wgpu::{Device, DeviceDescriptor, Instance, Queue, TextureFormat};
 use winit::{dpi::PhysicalSize, event_loop::OwnedDisplayHandle, window::Window};
 
 pub type SharedRenderer = Arc<RwLock<Renderer>>;

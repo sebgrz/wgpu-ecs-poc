@@ -1,9 +1,6 @@
-
 use crate::manager::{
-    asset_manager::SharedAssetsManager,
-    pipeline_manager::SharedPipelineManager,
-    texture_manager::SharedTextureManager,
-    uniform_buffer_manager::SharedUniformBufferManager,
+    asset_manager::SharedAssetsManager, pipeline_manager::SharedPipelineManager,
+    texture_manager::SharedTextureManager, uniform_buffer_manager::SharedUniformBufferManager,
 };
 
 pub struct InnerManagersResource {

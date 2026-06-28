@@ -15,9 +15,8 @@ pub enum AssetType {
         width: i32,
         height: i32,
     },
-    Shader {
-        shader_str: String,
-    }, // TODO: music, level, so eon
+    Shader(String),
+    // TODO: music, level, so eon
 }
 
 pub struct AssetManager {
@@ -51,6 +50,12 @@ impl AssetManager {
             .ok_or(format!("asset_id {} doesn't exists", asset_id))?;
         match asset {
             AssetType::Texture { path, .. } => {
+                let mut file = File::open(path).unwrap();
+                let mut bytes = Vec::new();
+                file.read_to_end(&mut bytes).unwrap();
+                return Ok(bytes);
+            }
+            AssetType::Shader(path) => {
                 let mut file = File::open(path).unwrap();
                 let mut bytes = Vec::new();
                 file.read_to_end(&mut bytes).unwrap();
