@@ -1,4 +1,7 @@
-use std::sync::Arc;
+use std::{
+    sync::Arc,
+    time::{Duration, Instant},
+};
 
 use winit::{
     application::ApplicationHandler,
@@ -9,16 +12,23 @@ use winit::{
 
 use crate::renderer::SharedRenderer;
 
+pub struct WindowCalls {
+    pub create: Box<dyn FnMut()>,
+    pub render: Box<dyn FnMut(Duration)>,
+}
+
 pub struct WindowApplication {
     window: Option<Arc<Window>>,
     renderer: SharedRenderer,
+    window_calls: WindowCalls,
 }
 
 impl WindowApplication {
-    pub fn init(renderer: SharedRenderer) -> Self {
+    pub fn init(renderer: SharedRenderer, window_calls: WindowCalls) -> Self {
         Self {
             window: None,
             renderer: renderer,
+            window_calls,
         }
     }
 
@@ -32,9 +42,12 @@ impl WindowApplication {
         let window_shared = Arc::new(window);
 
         self.window = Some(window_shared.clone());
-        let renderer = self.renderer.clone();
-        let mut renderer = renderer.write().unwrap();
-        renderer.create_renderer(event_loop.owned_display_handle(), window_shared.clone());
+        {
+            let mut renderer = self.renderer.write().unwrap();
+            renderer.create_renderer(event_loop.owned_display_handle(), window_shared.clone());
+        }
+
+        (self.window_calls.create)();
 
         window_shared.clone().request_redraw();
     }
@@ -51,8 +64,9 @@ impl ApplicationHandler for WindowApplication {
         _window_id: WindowId,
         event: WindowEvent,
     ) {
-        let renderer = self.renderer.read().unwrap();
+        // let renderer = self.renderer.read().unwrap();
         let window = self.window.clone().unwrap();
+        let mut last_time = Instant::now();
 
         match event {
             WindowEvent::CloseRequested => {
@@ -62,8 +76,12 @@ impl ApplicationHandler for WindowApplication {
                 window.request_redraw();
             }
             WindowEvent::RedrawRequested => {
-                renderer.render();
+                let now = Instant::now();
+                let dt = now - last_time;
+                // renderer.render(); TODO is not required, render is doing from ecs
+                (self.window_calls.render)(dt);
                 window.request_redraw();
+                last_time = now;
             }
             _ => {}
         }

@@ -6,3 +6,4 @@ edition = "2021"
 [dependencies]
 wgpu_core = { path = "../core" }
 winit = { workspace = true }
+specs = { workspace = true }
