@@ -50,13 +50,13 @@ impl AssetManager {
             .ok_or(format!("asset_id {} doesn't exists", asset_id))?;
         match asset {
             AssetType::Texture { path, .. } => {
-                let mut file = File::open(path).unwrap();
+                let mut file = File::open(path).expect(format!("texture path: {}", path).as_ref());
                 let mut bytes = Vec::new();
                 file.read_to_end(&mut bytes).unwrap();
                 return Ok(bytes);
             }
             AssetType::Shader(path) => {
-                let mut file = File::open(path).unwrap();
+                let mut file = File::open(path).expect(format!("shader path: {}", path).as_ref());
                 let mut bytes = Vec::new();
                 file.read_to_end(&mut bytes).unwrap();
                 return Ok(bytes);

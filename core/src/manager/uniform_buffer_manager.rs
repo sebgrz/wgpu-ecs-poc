@@ -38,7 +38,7 @@ impl<'r> UniformBufferManager {
         let uniform_bind_group_layout =
             device.create_bind_group_layout(&wgpu::BindGroupLayoutDescriptor {
                 entries: &[BindGroupLayoutEntry {
-                    binding: 1,
+                    binding: 0, // TODO: should be control from function parameter
                     visibility: ShaderStages::VERTEX,
                     ty: wgpu::BindingType::Buffer {
                         ty: wgpu::BufferBindingType::Uniform,
@@ -61,7 +61,7 @@ impl<'r> UniformBufferManager {
             label: Some(format!("{}_uniform_bind_group", buffer_id).as_ref()),
             layout: &uniform_bind_group_layout,
             entries: &[BindGroupEntry {
-                binding: 1,
+                binding: 0,
                 resource: wgpu::BindingResource::Buffer(wgpu::BufferBinding {
                     buffer: &uniform_buffer,
                     size: None,
