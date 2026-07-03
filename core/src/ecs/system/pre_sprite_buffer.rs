@@ -36,7 +36,7 @@ impl<'a> System<'a> for PreSpriteBuffer {
 
         let mut count = 0;
         for (position, tile) in (&position, &tile).join() {
-            println!("sprite: {:?} {:?}", position, tile);
+            // println!("sprite: {:?} {:?}", position, tile);
             if let Some(size) = tex_manager.borrow_size_cache(&tile.texture_id) {
                 let sprite = Sprite {
                     x: position.x,

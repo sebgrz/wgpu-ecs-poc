@@ -6,7 +6,7 @@ use crate::{
     ecs::{
         component::{position::Position, tile::Tile},
         resource::{
-            managers::ManagersResource, renderer::RendererResource,
+            input::InputResource, managers::ManagersResource, renderer::RendererResource,
             sprites_buffer::SpritesBufferResource, state::StateResource,
         },
     },
@@ -18,6 +18,7 @@ use crate::{
 };
 
 pub mod ecs;
+pub mod input;
 pub mod manager;
 pub mod renderer;
 pub mod uniform;
@@ -51,5 +52,6 @@ pub fn init_managers(world: &mut World, renderer: SharedRenderer) {
     });
     world.insert(SpritesBufferResource::default());
     world.insert(StateResource::default());
+    world.insert(InputResource::default());
     world.maintain();
 }

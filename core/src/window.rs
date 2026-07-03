@@ -7,13 +7,18 @@ use winit::{
     application::ApplicationHandler,
     event::WindowEvent,
     event_loop::ActiveEventLoop,
+    keyboard::NamedKey,
     window::{Window, WindowId},
 };
 
-use crate::renderer::SharedRenderer;
+use crate::{
+    input::{KeyType, KeyboardInputAction, SpecialKey},
+    renderer::SharedRenderer,
+};
 
 pub struct WindowCalls {
     pub create: Box<dyn FnMut()>,
+    pub input: Box<dyn FnMut(KeyboardInputAction)>,
     pub update: Box<dyn FnMut(Duration)>,
     pub render: Box<dyn FnMut(Duration)>,
 }
@@ -93,6 +98,35 @@ impl ApplicationHandler for WindowApplication {
                     self.last_render_time = now;
                 }
                 window.request_redraw();
+            }
+            WindowEvent::KeyboardInput {
+                device_id,
+                event,
+                is_synthetic: _,
+            } => {
+                let key = match event.logical_key {
+                    winit::keyboard::Key::Character(ch) => Some(KeyType::CHAR(ch.to_string())),
+                    winit::keyboard::Key::Named(named) => match named {
+                        NamedKey::Enter => Some(KeyType::SPECIAL(SpecialKey::ENTER)),
+                        NamedKey::Escape => Some(KeyType::SPECIAL(SpecialKey::ESCAPE)),
+                        NamedKey::ArrowLeft => Some(KeyType::SPECIAL(SpecialKey::LEFT)),
+                        NamedKey::ArrowRight => Some(KeyType::SPECIAL(SpecialKey::RIGHT)),
+                        NamedKey::ArrowUp => Some(KeyType::SPECIAL(SpecialKey::UP)),
+                        NamedKey::ArrowDown => Some(KeyType::SPECIAL(SpecialKey::DOWN)),
+                        NamedKey::Space => Some(KeyType::SPECIAL(SpecialKey::SPACE)),
+                        _ => None,
+                    },
+                    _ => None,
+                };
+                if key.is_none() {
+                    return;
+                }
+
+                let action = KeyboardInputAction {
+                    is_pressed: event.state.is_pressed(),
+                    key: key.unwrap(),
+                };
+                (self.window_calls.input)(action);
             }
             _ => {}
         }

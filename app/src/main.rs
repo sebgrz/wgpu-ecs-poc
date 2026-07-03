@@ -4,12 +4,14 @@ use specs::{Builder, DispatcherBuilder, RunNow, WorldExt};
 use wgpu_core::{
     ecs::{
         component::{position::Position, tile::Tile},
+        resource::input::InputResource,
         system::{
             init::Init, pre_sprite_buffer::PreSpriteBuffer, scene_loader::SceneLoader,
             sprite_renderer::SpriteRenderer,
         },
     },
     init_managers,
+    input::KeyboardInputAction,
     window::{WindowApplication, WindowCalls},
 };
 
@@ -72,8 +74,24 @@ fn main() {
         sprite_renderer_sys.run_now(&world);
     };
 
+    let world_input = world.clone();
+    let input_call = move |key_action: KeyboardInputAction| {
+        let world = world_input.read().unwrap();
+        let mut input_res = world.write_resource::<InputResource>();
+        if let Some(key_value) = input_res.keys.get(&key_action.key) {
+            if *key_value == key_action.is_pressed {
+                return;
+            }
+        }
+        input_res
+            .keys
+            .insert(key_action.key.clone(), key_action.is_pressed);
+        println!("key: {:?}", key_action);
+    };
+
     let window_calls = WindowCalls {
         create: Box::new(create_call),
+        input: Box::new(input_call),
         update: Box::new(update_call),
         render: Box::new(render_call),
     };
