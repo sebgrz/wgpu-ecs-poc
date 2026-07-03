@@ -1,12 +1,14 @@
-
 use winit::event_loop::EventLoop;
 
-use specs::{DispatcherBuilder, RunNow, WorldExt};
+use specs::{Builder, DispatcherBuilder, RunNow, WorldExt};
 use wgpu_core::{
-    ecs::system::{
+    ecs::{
+        component::{position::Position, tile::Tile},
+        system::{
             init::Init, pre_sprite_buffer::PreSpriteBuffer, scene_loader::SceneLoader,
             sprite_renderer::SpriteRenderer,
         },
+    },
     init_managers,
     window::{WindowApplication, WindowCalls},
 };
@@ -14,6 +16,31 @@ use wgpu_core::{
 fn main() {
     let event_loop = EventLoop::new().unwrap();
     let (renderer, world) = wgpu_core::init();
+    {
+        let mut world = world.write().unwrap();
+        world
+            .create_entity()
+            .with(Position { x: 10, y: 20 })
+            .with(Tile {
+                texture_id: "sprites_texture".to_owned(),
+                x: 3,
+                y: 16,
+                x2: 15,
+                y2: 32,
+            })
+            .build();
+        world
+            .create_entity()
+            .with(Position { x: 200, y: 125 })
+            .with(Tile {
+                texture_id: "sprites_texture".to_owned(),
+                x: 19,
+                y: 5,
+                x2: 27,
+                y2: 16,
+            })
+            .build();
+    }
 
     let mut dispatcher = DispatcherBuilder::new()
         .with(SceneLoader, "scene_loader", &[])
