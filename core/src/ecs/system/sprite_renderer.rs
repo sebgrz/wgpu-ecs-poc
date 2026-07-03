@@ -3,8 +3,10 @@ use wgpu::{CurrentSurfaceTexture, TextureViewDescriptor};
 
 use crate::ecs::{
     resource::{
-        managers::ManagersResource, renderer::RendererResource,
+        managers::ManagersResource,
+        renderer::RendererResource,
         sprites_buffer::SpritesBufferResource,
+        state::{State, StateResource},
     },
     SPRITES_BUFFER_UNIFORM, SPRITES_RENDER_PIPELINE_ID, SPRITES_TEXTURE_ID,
 };
@@ -16,10 +18,16 @@ impl<'a> System<'a> for SpriteRenderer {
         Read<'a, SpritesBufferResource>,
         Read<'a, ManagersResource>,
         Read<'a, RendererResource>,
+        Read<'a, StateResource>,
     );
 
     fn run(&mut self, data: Self::SystemData) {
-        let (sprites_buffer_resources, managers_resource, renderer_resource) = data;
+        let (sprites_buffer_resources, managers_resource, renderer_resource, state_res) = data;
+
+        if state_res.state != State::RENDER {
+            return;
+        }
+
         let inner_mangers = managers_resource.get_managers().unwrap();
         let uniform_buffer_manager = inner_mangers.uniform_buffer_manager.read().unwrap();
         let pipeline_manager = inner_mangers.pipeline_manager.read().unwrap();

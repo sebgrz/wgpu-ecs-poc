@@ -7,7 +7,7 @@ use crate::{
         component::{position::Position, tile::Tile},
         resource::{
             managers::ManagersResource, renderer::RendererResource,
-            sprites_buffer::SpritesBufferResource,
+            sprites_buffer::SpritesBufferResource, state::StateResource,
         },
     },
     manager::{
@@ -50,5 +50,6 @@ pub fn init_managers(world: &mut World, renderer: SharedRenderer) {
         renderer: Some(renderer.clone()),
     });
     world.insert(SpritesBufferResource::default());
+    world.insert(StateResource::default());
     world.maintain();
 }

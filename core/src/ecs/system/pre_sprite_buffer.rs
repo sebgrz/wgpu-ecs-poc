@@ -3,7 +3,11 @@ use specs::{Read, ReadStorage, System, Write};
 use crate::{
     ecs::{
         component::{position::Position, tile::Tile},
-        resource::{managers::ManagersResource, sprites_buffer::SpritesBufferResource},
+        resource::{
+            managers::ManagersResource,
+            sprites_buffer::SpritesBufferResource,
+            state::{State, StateResource},
+        },
     },
     uniform::sprite::Sprite,
 };
@@ -13,6 +17,7 @@ pub struct PreSpriteBuffer;
 impl<'a> System<'a> for PreSpriteBuffer {
     type SystemData = (
         Read<'a, ManagersResource>,
+        Read<'a, StateResource>,
         Write<'a, SpritesBufferResource>,
         ReadStorage<'a, Position>,
         ReadStorage<'a, Tile>,
@@ -20,7 +25,12 @@ impl<'a> System<'a> for PreSpriteBuffer {
 
     fn run(&mut self, data: Self::SystemData) {
         use specs::Join;
-        let (managers_res, mut sprites_buffer_res, position, tile) = data;
+        let (managers_res, state_res, mut sprites_buffer_res, position, tile) = data;
+
+        if state_res.state != State::RENDER {
+            return;
+        }
+
         let inner_managers = managers_res.get_managers().unwrap();
         let tex_manager = inner_managers.texture_manager.read().unwrap();
 

@@ -1,16 +1,12 @@
-use std::time::Duration;
 
 use winit::event_loop::EventLoop;
 
 use specs::{DispatcherBuilder, RunNow, WorldExt};
 use wgpu_core::{
-    ecs::{
-        resource::renderer,
-        system::{
+    ecs::system::{
             init::Init, pre_sprite_buffer::PreSpriteBuffer, scene_loader::SceneLoader,
             sprite_renderer::SpriteRenderer,
         },
-    },
     init_managers,
     window::{WindowApplication, WindowCalls},
 };
@@ -36,22 +32,22 @@ fn main() {
         init_sys.run_now(&world);
     };
 
-    let world_render = world.clone();
-    let mut frame_time = Duration::from_millis(0);
-    let render_call = move |dt| {
-        println!("render dt: {dt:?}");
-        let world = world_render.read().unwrap();
+    let world_update = world.clone();
+    let update_call = move |_dt| {
+        let world = world_update.read().unwrap();
         dispatcher.dispatch(&world);
-        frame_time += dt;
-
-        if frame_time.as_millis() > 16 {
-            let mut sprite_renderer_sys = SpriteRenderer;
-            sprite_renderer_sys.run_now(&world);
-            frame_time = Duration::from_millis(0);
-        }
     };
+
+    let world_render = world.clone();
+    let render_call = move |_dt| {
+        let world = world_render.read().unwrap();
+        let mut sprite_renderer_sys = SpriteRenderer;
+        sprite_renderer_sys.run_now(&world);
+    };
+
     let window_calls = WindowCalls {
         create: Box::new(create_call),
+        update: Box::new(update_call),
         render: Box::new(render_call),
     };
     let mut app = WindowApplication::init(renderer.clone(), window_calls);

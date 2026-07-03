@@ -2,8 +2,11 @@ use specs::{System, Write};
 
 use crate::{
     ecs::{
-        resource::managers::ManagersResource, MAIN_SHADERS_ID, SPRITES_BUFFER_UNIFORM,
-        SPRITES_RENDER_PIPELINE_ID, SPRITES_TEXTURE_ID,
+        resource::{
+            managers::ManagersResource,
+            state::{State, StateResource},
+        },
+        MAIN_SHADERS_ID, SPRITES_BUFFER_UNIFORM, SPRITES_RENDER_PIPELINE_ID, SPRITES_TEXTURE_ID,
     },
     uniform::sprite::Sprite,
 };
@@ -11,10 +14,15 @@ use crate::{
 pub struct SceneLoader;
 
 impl<'a> System<'a> for SceneLoader {
-    type SystemData = Write<'a, ManagersResource>;
+    type SystemData = (Write<'a, ManagersResource>, Write<'a, StateResource>);
 
     fn run(&mut self, data: Self::SystemData) {
-        let inner_managers = data.get_managers().unwrap();
+        let (managers_res, mut state_res) = data;
+        if state_res.state != State::SCENE {
+            return;
+        }
+
+        let inner_managers = managers_res.get_managers().unwrap();
         let assets_manager = inner_managers.assets_manager.read().unwrap();
 
         // load textures
@@ -44,5 +52,7 @@ impl<'a> System<'a> for SceneLoader {
                 bind_group_layouts,
             )
             .unwrap();
+
+        state_res.state = State::RENDER;
     }
 }

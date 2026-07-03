@@ -86,7 +86,11 @@ impl<'r> UniformBufferManager {
         let uniform_buffer_object = self.buffers_map.get(buffer_id).unwrap();
         let renderer = self.renderer.read().unwrap();
         let (_, queue) = renderer.borrow_device();
-        queue.write_buffer(&uniform_buffer_object.buffer, 0, &bytemuck::cast_vec(data));
+        queue.write_buffer(
+            &uniform_buffer_object.buffer,
+            0,
+            &bytemuck::cast_slice(&data),
+        );
     }
 
     pub fn insert<T>(&self, buffer_id: &str, data: &T, index: u64)

@@ -14,6 +14,7 @@ use crate::renderer::SharedRenderer;
 
 pub struct WindowCalls {
     pub create: Box<dyn FnMut()>,
+    pub update: Box<dyn FnMut(Duration)>,
     pub render: Box<dyn FnMut(Duration)>,
 }
 
@@ -21,14 +22,19 @@ pub struct WindowApplication {
     window: Option<Arc<Window>>,
     renderer: SharedRenderer,
     window_calls: WindowCalls,
+    last_render_time: Instant,
+    last_update_time: Instant,
 }
 
 impl WindowApplication {
     pub fn init(renderer: SharedRenderer, window_calls: WindowCalls) -> Self {
+        let now = Instant::now();
         Self {
             window: None,
             renderer: renderer,
             window_calls,
+            last_render_time: now,
+            last_update_time: now,
         }
     }
 
@@ -64,9 +70,7 @@ impl ApplicationHandler for WindowApplication {
         _window_id: WindowId,
         event: WindowEvent,
     ) {
-        // let renderer = self.renderer.read().unwrap();
         let window = self.window.clone().unwrap();
-        let mut last_time = Instant::now();
 
         match event {
             WindowEvent::CloseRequested => {
@@ -76,12 +80,19 @@ impl ApplicationHandler for WindowApplication {
                 window.request_redraw();
             }
             WindowEvent::RedrawRequested => {
+                let frame_target_time = self.last_render_time + Duration::from_millis(16);
+                let update_target_time = self.last_update_time + Duration::from_millis(1);
                 let now = Instant::now();
-                let dt = now - last_time;
-                // renderer.render(); TODO is not required, render is doing from ecs
-                (self.window_calls.render)(dt);
+                if now >= update_target_time {
+                    (self.window_calls.update)(now - self.last_update_time);
+                    self.last_update_time = now;
+                }
+
+                if now >= frame_target_time {
+                    (self.window_calls.render)(now - self.last_render_time);
+                    self.last_render_time = now;
+                }
                 window.request_redraw();
-                last_time = now;
             }
             _ => {}
         }
