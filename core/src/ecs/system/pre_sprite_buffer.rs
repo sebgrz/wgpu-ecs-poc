@@ -41,8 +41,8 @@ impl<'a> System<'a> for PreSpriteBuffer {
                 let sprite = Sprite {
                     x: position.x,
                     y: position.y,
-                    width: 100,  // TODO
-                    height: 100, // TODO
+                    width: 100.0,  // TODO
+                    height: 100.0, // TODO
                     texture_clip: tile.into_tex_dimensions(size.clone()),
                 };
                 buffers_res.sprites[count] = sprite;

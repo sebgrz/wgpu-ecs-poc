@@ -6,8 +6,8 @@ use crate::{
     ecs::{
         component::{player::Player, position::Position, tile::Tile},
         resource::{
-            buffers::BuffersResource, input::InputResource, managers::ManagersResource,
-            renderer::RendererResource, state::StateResource,
+            buffers::BuffersResource, delta_time::DeltaTimeResource, input::InputResource,
+            managers::ManagersResource, renderer::RendererResource, state::StateResource,
         },
     },
     manager::{
@@ -54,5 +54,6 @@ pub fn init_managers(world: &mut World, renderer: SharedRenderer) {
     world.insert(BuffersResource::default());
     world.insert(StateResource::default());
     world.insert(InputResource::default());
+    world.insert(DeltaTimeResource::default());
     world.maintain();
 }

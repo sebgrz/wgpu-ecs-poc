@@ -86,12 +86,9 @@ impl ApplicationHandler for WindowApplication {
             }
             WindowEvent::RedrawRequested => {
                 let frame_target_time = self.last_render_time + Duration::from_millis(16);
-                let update_target_time = self.last_update_time + Duration::from_millis(1);
                 let now = Instant::now();
-                if now >= update_target_time {
-                    (self.window_calls.update)(now - self.last_update_time);
-                    self.last_update_time = now;
-                }
+                (self.window_calls.update)(now - self.last_update_time);
+                self.last_update_time = now;
 
                 if now >= frame_target_time {
                     (self.window_calls.render)(now - self.last_render_time);

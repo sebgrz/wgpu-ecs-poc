@@ -21,7 +21,7 @@ fn translation_with_identity_mat(t: vec3f) -> mat4x4<f32> {
 }
 
 struct Sprite {
-  rect: vec4<i32>,
+  rect: vec4<f32>,
   tex_clip: vec4<f32>
 }
 
@@ -43,12 +43,12 @@ fn vs_main(@builtin(vertex_index) in_vertex_index: u32, @builtin(instance_index)
     let sprite = sprites[instance];
 
     let points_arr = array(
-      vec2f(0, f32(sprite.rect.w)),
+      vec2f(0, sprite.rect.w),
       vec2f(0, 0),
-      vec2f(f32(sprite.rect.z), 0),
-      vec2f(f32(sprite.rect.z), 0),
-      vec2f(f32(sprite.rect.z), f32(sprite.rect.w)),
-      vec2f(0, f32(sprite.rect.w)),
+      vec2f(sprite.rect.z, 0),
+      vec2f(sprite.rect.z, 0),
+      vec2f(sprite.rect.z, sprite.rect.w),
+      vec2f(0, sprite.rect.w),
     );
     let tex_coords_arr = array(
       vec2f(sprite.tex_clip.x, sprite.tex_clip.w),
@@ -66,8 +66,8 @@ fn vs_main(@builtin(vertex_index) in_vertex_index: u32, @builtin(instance_index)
 
     return VertexOutput(
         ortho_mat * camera_mat * vec4<f32>(
-          f32(sprite.rect.x) + pos.x, 
-          f32(sprite.rect.y) + pos.y, 
+          sprite.rect.x + pos.x, 
+          sprite.rect.y + pos.y, 
           1.0, 1.0),
         vec2f(   
           tex_coords.x,

@@ -3,6 +3,6 @@ use specs::{Component, VecStorage};
 #[derive(Component, Debug)]
 #[storage(VecStorage)]
 pub struct Position {
-    pub x: i32,
-    pub y: i32,
+    pub x: f32,
+    pub y: f32,
 }
