@@ -7,3 +7,4 @@ members = [
 [workspace.dependencies]
 winit = "0.30.13"
 specs = { version="0.20.0", features=["specs-derive"] }
+glam = { version = "0.33.2", default-features = false, features = ["libm", "bytemuck"] }

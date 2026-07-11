@@ -1,5 +1,5 @@
-use specs::{Component, VecStorage};
+use specs::{Component, NullStorage};
 
 #[derive(Component, Debug)]
-#[storage(VecStorage)]
+#[storage(NullStorage)]
 pub struct Player;

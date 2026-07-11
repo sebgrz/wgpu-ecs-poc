@@ -1,3 +1,5 @@
+mod system;
+
 use winit::event_loop::EventLoop;
 
 use specs::{Builder, DispatcherBuilder, RunNow, WorldExt};
@@ -14,6 +16,8 @@ use wgpu_core::{
     input::KeyboardInputAction,
     window::{WindowApplication, WindowCalls},
 };
+
+use crate::system::player::PlayerSystem;
 
 fn main() {
     let event_loop = EventLoop::new().unwrap();
@@ -47,6 +51,7 @@ fn main() {
 
     let mut dispatcher = DispatcherBuilder::new()
         .with(SceneLoader, "scene_loader", &[])
+        .with(PlayerSystem, "player", &[])
         .with(PreSpriteBuffer, "pre_sprite_buffer", &[])
         .with(ReloadBuffers, "reload_buffers", &[])
         .build();

@@ -7,3 +7,4 @@ edition = "2021"
 wgpu_core = { path = "../core" }
 winit = { workspace = true }
 specs = { workspace = true }
+glam = { workspace = true }
