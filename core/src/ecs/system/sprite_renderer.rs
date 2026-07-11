@@ -3,26 +3,26 @@ use wgpu::{CurrentSurfaceTexture, TextureViewDescriptor};
 
 use crate::ecs::{
     resource::{
+        buffers::BuffersResource,
         managers::ManagersResource,
         renderer::RendererResource,
-        sprites_buffer::SpritesBufferResource,
         state::{State, StateResource},
     },
-    SPRITES_BUFFER_UNIFORM, SPRITES_RENDER_PIPELINE_ID, SPRITES_TEXTURE_ID,
+    CAMERA_BUFFER_UNIFORM, SPRITES_BUFFER_UNIFORM, SPRITES_RENDER_PIPELINE_ID, SPRITES_TEXTURE_ID,
 };
 
 pub struct SpriteRenderer;
 
 impl<'a> System<'a> for SpriteRenderer {
     type SystemData = (
-        Read<'a, SpritesBufferResource>,
         Read<'a, ManagersResource>,
         Read<'a, RendererResource>,
+        Read<'a, BuffersResource>,
         Read<'a, StateResource>,
     );
 
     fn run(&mut self, data: Self::SystemData) {
-        let (sprites_buffer_resources, managers_resource, renderer_resource, state_res) = data;
+        let (managers_resource, renderer_resource, sprites_buffer_resources, state_res) = data;
 
         if state_res.state != State::RENDER {
             return;
@@ -33,13 +33,12 @@ impl<'a> System<'a> for SpriteRenderer {
         let pipeline_manager = inner_mangers.pipeline_manager.read().unwrap();
         let tex_manager = inner_mangers.texture_manager.read().unwrap();
 
-        // write sprites to gpu buffer
-        let sprites = sprites_buffer_resources.sprites;
-        let fragment_sprites = &sprites[0..sprites_buffer_resources.size];
-        uniform_buffer_manager
-            .write_from_beginning(SPRITES_BUFFER_UNIFORM, fragment_sprites.to_vec());
+        // bind groups
         let (sprites_bind_group, _) = uniform_buffer_manager
             .borrow_bind_group(SPRITES_BUFFER_UNIFORM)
+            .unwrap();
+        let (camera_bind_group, _) = uniform_buffer_manager
+            .borrow_bind_group(CAMERA_BUFFER_UNIFORM)
             .unwrap();
 
         // texture
@@ -87,8 +86,9 @@ impl<'a> System<'a> for SpriteRenderer {
                     render_pass.set_pipeline(render_pipeline);
                     render_pass.set_bind_group(0, Some(&texture_obj.bind_group), &[]);
                     render_pass.set_bind_group(1, Some(sprites_bind_group), &[]);
+                    render_pass.set_bind_group(2, Some(camera_bind_group), &[]);
 
-                    render_pass.draw(0..6, 0..sprites_buffer_resources.size as u32);
+                    render_pass.draw(0..6, 0..sprites_buffer_resources.sprites_size as u32);
                     // End the renderpass.
                     drop(render_pass);
 

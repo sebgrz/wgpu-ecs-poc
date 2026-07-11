@@ -4,8 +4,8 @@ use crate::{
     ecs::{
         component::{position::Position, tile::Tile},
         resource::{
+            buffers::BuffersResource,
             managers::ManagersResource,
-            sprites_buffer::SpritesBufferResource,
             state::{State, StateResource},
         },
     },
@@ -18,14 +18,14 @@ impl<'a> System<'a> for PreSpriteBuffer {
     type SystemData = (
         Read<'a, ManagersResource>,
         Read<'a, StateResource>,
-        Write<'a, SpritesBufferResource>,
+        Write<'a, BuffersResource>,
         ReadStorage<'a, Position>,
         ReadStorage<'a, Tile>,
     );
 
     fn run(&mut self, data: Self::SystemData) {
         use specs::Join;
-        let (managers_res, state_res, mut sprites_buffer_res, position, tile) = data;
+        let (managers_res, state_res, mut buffers_res, position, tile) = data;
 
         if state_res.state != State::RENDER {
             return;
@@ -45,11 +45,11 @@ impl<'a> System<'a> for PreSpriteBuffer {
                     height: 100, // TODO
                     texture_clip: tile.into_tex_dimensions(size.clone()),
                 };
-                sprites_buffer_res.sprites[count] = sprite;
+                buffers_res.sprites[count] = sprite;
                 count += 1;
             }
         }
 
-        sprites_buffer_res.size = count;
+        buffers_res.sprites_size = count;
     }
 }

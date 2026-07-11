@@ -11,6 +11,15 @@ fn ortho(left: f32, right: f32, bottom: f32, top: f32, near: f32, far: f32) -> m
     );
 }
 
+fn translation_with_identity_mat(t: vec3f) -> mat4x4<f32> {
+    return mat4x4<f32>(
+        1.0, 0.0, 0.0, 0.0,
+        0.0, 1.0, 0.0, 0.0,
+        0.0, 0.0, 1.0, 0.0,
+        t.x, t.y, t.z, 1.0
+    );
+}
+
 struct Sprite {
   rect: vec4<i32>,
   tex_clip: vec4<f32>
@@ -21,10 +30,13 @@ struct VertexOutput {
     @location(0) tex_coords: vec2<f32>,
 }
 
-
 @group(1)
 @binding(0)
 var<uniform> sprites: array<Sprite, 1024>;
+
+@group(2)
+@binding(0)
+var<uniform> camera: vec3f;
 
 @vertex
 fn vs_main(@builtin(vertex_index) in_vertex_index: u32, @builtin(instance_index) instance: u32) -> VertexOutput {
@@ -48,11 +60,12 @@ fn vs_main(@builtin(vertex_index) in_vertex_index: u32, @builtin(instance_index)
     );
 
     let ortho_mat = ortho(0, WIDTH, HEIGHT, 0, 0.1, 100);
+    let camera_mat = translation_with_identity_mat(camera);
     let pos = points_arr[in_vertex_index];
     let tex_coords = tex_coords_arr[in_vertex_index];
 
     return VertexOutput(
-        ortho_mat * vec4<f32>(
+        ortho_mat * camera_mat * vec4<f32>(
           f32(sprite.rect.x) + pos.x, 
           f32(sprite.rect.y) + pos.y, 
           1.0, 1.0),

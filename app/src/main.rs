@@ -3,11 +3,11 @@ use winit::event_loop::EventLoop;
 use specs::{Builder, DispatcherBuilder, RunNow, WorldExt};
 use wgpu_core::{
     ecs::{
-        component::{position::Position, tile::Tile},
+        component::{player::Player, position::Position, tile::Tile},
         resource::input::InputResource,
         system::{
-            init::Init, pre_sprite_buffer::PreSpriteBuffer, scene_loader::SceneLoader,
-            sprite_renderer::SpriteRenderer,
+            init::Init, pre_sprite_buffer::PreSpriteBuffer, reload_buffers::ReloadBuffers,
+            scene_loader::SceneLoader, sprite_renderer::SpriteRenderer,
         },
     },
     init_managers,
@@ -22,6 +22,7 @@ fn main() {
         let mut world = world.write().unwrap();
         world
             .create_entity()
+            .with(Player)
             .with(Position { x: 10, y: 20 })
             .with(Tile {
                 texture_id: "sprites_texture".to_owned(),
@@ -47,6 +48,7 @@ fn main() {
     let mut dispatcher = DispatcherBuilder::new()
         .with(SceneLoader, "scene_loader", &[])
         .with(PreSpriteBuffer, "pre_sprite_buffer", &[])
+        .with(ReloadBuffers, "reload_buffers", &[])
         .build();
 
     let world_create = world.clone();

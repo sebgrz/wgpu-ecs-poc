@@ -100,7 +100,7 @@ impl ApplicationHandler for WindowApplication {
                 window.request_redraw();
             }
             WindowEvent::KeyboardInput {
-                device_id,
+                device_id: _,
                 event,
                 is_synthetic: _,
             } => {

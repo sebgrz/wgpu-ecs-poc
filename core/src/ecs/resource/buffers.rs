@@ -1,17 +1,21 @@
 use std::array;
 
+use glam::Vec3;
+
 use crate::uniform::sprite::Sprite;
 
-pub struct SpritesBufferResource {
+pub struct BuffersResource {
+    pub camera: Vec3,
     pub sprites: [Sprite; 1024],
-    pub size: usize,
+    pub sprites_size: usize,
 }
 
-impl Default for SpritesBufferResource {
+impl Default for BuffersResource {
     fn default() -> Self {
         Self {
+            camera: Vec3::ZERO,
             sprites: array::from_fn(|_| Sprite::default()),
-            size: 0,
+            sprites_size: 0,
         }
     }
 }

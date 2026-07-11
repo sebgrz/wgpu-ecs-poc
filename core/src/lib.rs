@@ -4,10 +4,10 @@ use specs::{World, WorldExt};
 
 use crate::{
     ecs::{
-        component::{position::Position, tile::Tile},
+        component::{player::Player, position::Position, tile::Tile},
         resource::{
-            input::InputResource, managers::ManagersResource, renderer::RendererResource,
-            sprites_buffer::SpritesBufferResource, state::StateResource,
+            buffers::BuffersResource, input::InputResource, managers::ManagersResource,
+            renderer::RendererResource, state::StateResource,
         },
     },
     manager::{
@@ -31,6 +31,7 @@ pub fn init() -> (SharedRenderer, SharedWorld) {
     let mut world = World::new();
     world.register::<Position>();
     world.register::<Tile>();
+    world.register::<Player>();
 
     (renderer.clone(), Arc::new(RwLock::new(world)))
 }
@@ -50,7 +51,7 @@ pub fn init_managers(world: &mut World, renderer: SharedRenderer) {
     world.insert(RendererResource {
         renderer: Some(renderer.clone()),
     });
-    world.insert(SpritesBufferResource::default());
+    world.insert(BuffersResource::default());
     world.insert(StateResource::default());
     world.insert(InputResource::default());
     world.maintain();
