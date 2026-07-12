@@ -122,4 +122,14 @@ impl<'r> UniformBufferManager {
         uniform_buffer_object.buffer.destroy();
         self.buffers_map.remove(buffer_id);
     }
+
+    pub fn cleanup_all(&mut self) {
+        let buffers_ids: Vec<String> = self.buffers_map.keys().cloned().collect();
+
+        for buffer_id in buffers_ids {
+            let uniform_buffer_object = self.buffers_map.get(&buffer_id).unwrap();
+            uniform_buffer_object.buffer.destroy();
+            self.buffers_map.remove(&buffer_id);
+        }
+    }
 }

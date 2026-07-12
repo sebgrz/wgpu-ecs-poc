@@ -8,6 +8,8 @@ use wgpu_core::ecs::{
     },
 };
 
+use crate::game::state::GameState;
+
 pub(crate) struct PlayerSystem;
 
 impl<'a> System<'a> for PlayerSystem {
@@ -25,7 +27,8 @@ impl<'a> System<'a> for PlayerSystem {
 
         let (entities, delta_time_res, input_res, state_res, player, mut position) = data;
 
-        if state_res.state != State::RENDER {
+        if state_res.state != State::RENDER && state_res.game_state != GameState::LEVEL.to_string()
+        {
             return;
         }
 

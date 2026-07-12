@@ -1,3 +1,4 @@
+mod game;
 mod system;
 
 use winit::event_loop::EventLoop;
@@ -5,8 +6,7 @@ use winit::event_loop::EventLoop;
 use specs::{Builder, DispatcherBuilder, RunNow, WorldExt};
 use wgpu_core::{
     ecs::{
-        component::{player::Player, position::Position, size::Size, tile::Tile},
-        resource::{delta_time::DeltaTimeResource, input::InputResource},
+        resource::{delta_time::DeltaTimeResource, input::InputResource, state::StateResource},
         system::{
             init::Init, pre_sprite_buffer::PreSpriteBuffer, reload_buffers::ReloadBuffers,
             scene_loader::SceneLoader, sprite_renderer::SpriteRenderer,
@@ -17,52 +17,23 @@ use wgpu_core::{
     window::{WindowApplication, WindowCalls},
 };
 
-use crate::system::{camera::CameraSystem, player::PlayerSystem};
+use crate::{
+    game::state::GameState,
+    system::{camera::CameraSystem, menu::MenuSystem, player::PlayerSystem, spawn::SpawnSystem},
+};
 
 fn main() {
     let event_loop = EventLoop::new().unwrap();
     let (renderer, world) = wgpu_core::init();
-    {
-        let mut world = world.write().unwrap();
-        world
-            .create_entity()
-            .with(Player)
-            .with(Size {
-                width: 100.0,
-                height: 150.0,
-            })
-            .with(Position { x: 10.0, y: 20.0 })
-            .with(Tile {
-                texture_id: "sprites_texture".to_owned(),
-                x: 3,
-                y: 16,
-                x2: 15,
-                y2: 32,
-            })
-            .build();
-        world
-            .create_entity()
-            .with(Size {
-                width: 100.0,
-                height: 100.0,
-            })
-            .with(Position { x: 200.0, y: 125.0 })
-            .with(Tile {
-                texture_id: "sprites_texture".to_owned(),
-                x: 19,
-                y: 5,
-                x2: 27,
-                y2: 16,
-            })
-            .build();
-    }
 
     let mut dispatcher = DispatcherBuilder::new()
-        .with(SceneLoader, "scene_loader", &[])
-        .with(PlayerSystem, "player", &[])
-        .with(CameraSystem, "camera", &[])
-        .with(PreSpriteBuffer, "pre_sprite_buffer", &[])
-        .with(ReloadBuffers, "reload_buffers", &[])
+        .with(SpawnSystem, "spawn", &[])
+        .with(SceneLoader, "scene_loader", &["spawn"])
+        .with(MenuSystem, "menu", &["scene_loader"])
+        .with(PlayerSystem, "player", &["scene_loader"])
+        .with(CameraSystem, "camera", &["menu", "player"])
+        .with(PreSpriteBuffer, "pre_sprite_buffer", &["camera"])
+        .with(ReloadBuffers, "reload_buffers", &["camera"])
         .build();
 
     let world_create = world.clone();
@@ -72,6 +43,8 @@ fn main() {
         let renderer = renderer_create.clone();
 
         init_managers(&mut world, renderer);
+        let mut state_res = world.write_resource::<StateResource>();
+        state_res.game_state = GameState::MENU.to_string();
 
         let mut init_sys = Init;
         init_sys.run_now(&world);
@@ -79,12 +52,13 @@ fn main() {
 
     let world_update = world.clone();
     let update_call = move |dt| {
-        let world = world_update.read().unwrap();
+        let mut world = world_update.write().unwrap();
         {
             let mut delta_time_res = world.write_resource::<DeltaTimeResource>();
             delta_time_res.time = dt;
         }
         dispatcher.dispatch(&world);
+        world.maintain();
     };
 
     let world_render = world.clone();

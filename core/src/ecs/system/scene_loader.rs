@@ -7,8 +7,8 @@ use crate::{
             managers::ManagersResource,
             state::{State, StateResource},
         },
-        CAMERA_BUFFER_UNIFORM, MAIN_SHADERS_ID, SPRITES_BUFFER_UNIFORM, SPRITES_RENDER_PIPELINE_ID,
-        SPRITES_TEXTURE_ID,
+        CAMERA_BUFFER_UNIFORM, MAIN_SHADERS_ID, MENU_TEXTURE_ID, SPRITES_BUFFER_UNIFORM,
+        SPRITES_RENDER_PIPELINE_ID, SPRITES_TEXTURE_ID,
     },
     uniform::sprite::Sprite,
 };
@@ -29,12 +29,24 @@ impl<'a> System<'a> for SceneLoader {
 
         // load textures
         let mut tex_manager = inner_managers.texture_manager.write().unwrap();
-        tex_manager
-            .load_texture(&assets_manager, SPRITES_TEXTURE_ID)
-            .unwrap();
+        tex_manager.unload_all().unwrap();
+
+        // TODO: temporarily - this should take from some configuration
+        if state_res.game_state == "MENU" {
+            tex_manager
+                .load_texture(&assets_manager, MENU_TEXTURE_ID)
+                .unwrap();
+        }
+        if state_res.game_state == "LEVEL" {
+            tex_manager
+                .load_texture(&assets_manager, SPRITES_TEXTURE_ID)
+                .unwrap();
+        }
 
         // prepare uniforms
         let mut uniform_buffer_manager = inner_managers.uniform_buffer_manager.write().unwrap();
+        uniform_buffer_manager.cleanup_all();
+
         uniform_buffer_manager.create::<Sprite>(SPRITES_BUFFER_UNIFORM, 1024);
         uniform_buffer_manager.create::<Vec3>(CAMERA_BUFFER_UNIFORM, 1);
 

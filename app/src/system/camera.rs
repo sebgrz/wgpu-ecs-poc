@@ -8,6 +8,8 @@ use wgpu_core::ecs::{
     },
 };
 
+use crate::game::state::GameState;
+
 pub(crate) struct CameraSystem;
 
 impl<'a> System<'a> for CameraSystem {
@@ -27,8 +29,13 @@ impl<'a> System<'a> for CameraSystem {
             return;
         }
 
-        for (_, pos) in (&player, &position).join() {
-            buffers_res.camera = Vec3::new(-(pos.x - 350.0), -(pos.y - 250.0), 0.1);
+        if state_res.game_state == GameState::MENU.to_string() {
+            buffers_res.camera = Vec3::new(0.0, 0.0, 0.1);
+        }
+        if state_res.game_state == GameState::LEVEL.to_string() {
+            for (_, pos) in (&player, &position).join() {
+                buffers_res.camera = Vec3::new(-(pos.x - 350.0), -(pos.y - 250.0), 0.1);
+            }
         }
     }
 }

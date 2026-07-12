@@ -1,7 +1,9 @@
 use specs::{System, Write};
 
 use crate::{
-    ecs::{resource::managers::ManagersResource, MAIN_SHADERS_ID, SPRITES_TEXTURE_ID},
+    ecs::{
+        resource::managers::ManagersResource, MAIN_SHADERS_ID, MENU_TEXTURE_ID, SPRITES_TEXTURE_ID,
+    },
     manager::asset_manager::AssetType,
 };
 
@@ -20,6 +22,16 @@ impl<'a> System<'a> for Init {
                 SPRITES_TEXTURE_ID,
                 AssetType::Texture {
                     path: "res/sprites.png".to_owned(),
+                    width: 0,
+                    height: 0,
+                },
+            )
+            .unwrap();
+        assets_manager
+            .add(
+                MENU_TEXTURE_ID,
+                AssetType::Texture {
+                    path: "res/menu_buttons_sprite.png".to_owned(),
                     width: 0,
                     height: 0,
                 },

@@ -56,5 +56,4 @@ pub fn init_managers(world: &mut World, renderer: SharedRenderer) {
     world.insert(StateResource::default());
     world.insert(InputResource::default());
     world.insert(DeltaTimeResource::default());
-    world.maintain();
 }

@@ -144,6 +144,18 @@ impl TextureManager {
         Ok(())
     }
 
+    pub fn unload_all(&mut self) -> Result<(), TextureManagerError> {
+        let textures_ids: Vec<String> = self.textures_map.keys().cloned().collect();
+
+        for texture_id in textures_ids {
+            let texture_obj = self.textures_map.get(&texture_id).unwrap();
+            texture_obj.texture.destroy();
+            self.textures_map.remove(&texture_id);
+        }
+
+        Ok(())
+    }
+
     pub(crate) fn borrow_bind_group_layout(&self) -> &BindGroupLayout {
         &self.texture_bind_group_layout
     }
