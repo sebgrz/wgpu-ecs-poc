@@ -2,7 +2,7 @@ use specs::{Read, ReadStorage, System, Write};
 
 use crate::{
     ecs::{
-        component::{position::Position, tile::Tile},
+        component::{position::Position, size::Size, tile::Tile},
         resource::{
             buffers::BuffersResource,
             managers::ManagersResource,
@@ -19,13 +19,14 @@ impl<'a> System<'a> for PreSpriteBuffer {
         Read<'a, ManagersResource>,
         Read<'a, StateResource>,
         Write<'a, BuffersResource>,
+        ReadStorage<'a, Size>,
         ReadStorage<'a, Position>,
         ReadStorage<'a, Tile>,
     );
 
     fn run(&mut self, data: Self::SystemData) {
         use specs::Join;
-        let (managers_res, state_res, mut buffers_res, position, tile) = data;
+        let (managers_res, state_res, mut buffers_res, size, position, tile) = data;
 
         if state_res.state != State::RENDER {
             return;
@@ -35,15 +36,14 @@ impl<'a> System<'a> for PreSpriteBuffer {
         let tex_manager = inner_managers.texture_manager.read().unwrap();
 
         let mut count = 0;
-        for (position, tile) in (&position, &tile).join() {
-            // println!("sprite: {:?} {:?}", position, tile);
-            if let Some(size) = tex_manager.borrow_size_cache(&tile.texture_id) {
+        for (size, position, tile) in (&size, &position, &tile).join() {
+            if let Some(tex_size) = tex_manager.borrow_size_cache(&tile.texture_id) {
                 let sprite = Sprite {
                     x: position.x,
                     y: position.y,
-                    width: 100.0,  // TODO
-                    height: 100.0, // TODO
-                    texture_clip: tile.into_tex_dimensions(size.clone()),
+                    width: size.width,
+                    height: size.height,
+                    texture_clip: tile.into_tex_dimensions(tex_size.clone()),
                 };
                 buffers_res.sprites[count] = sprite;
                 count += 1;

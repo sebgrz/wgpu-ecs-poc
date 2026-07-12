@@ -4,7 +4,7 @@ use specs::{World, WorldExt};
 
 use crate::{
     ecs::{
-        component::{player::Player, position::Position, tile::Tile},
+        component::{player::Player, position::Position, size::Size, tile::Tile},
         resource::{
             buffers::BuffersResource, delta_time::DeltaTimeResource, input::InputResource,
             managers::ManagersResource, renderer::RendererResource, state::StateResource,
@@ -29,6 +29,7 @@ pub type SharedWorld = Arc<RwLock<World>>;
 pub fn init() -> (SharedRenderer, SharedWorld) {
     let renderer = Arc::new(RwLock::new(Renderer::default()));
     let mut world = World::new();
+    world.register::<Size>();
     world.register::<Position>();
     world.register::<Tile>();
     world.register::<Player>();

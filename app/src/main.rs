@@ -5,7 +5,7 @@ use winit::event_loop::EventLoop;
 use specs::{Builder, DispatcherBuilder, RunNow, WorldExt};
 use wgpu_core::{
     ecs::{
-        component::{player::Player, position::Position, tile::Tile},
+        component::{player::Player, position::Position, size::Size, tile::Tile},
         resource::{delta_time::DeltaTimeResource, input::InputResource},
         system::{
             init::Init, pre_sprite_buffer::PreSpriteBuffer, reload_buffers::ReloadBuffers,
@@ -27,6 +27,10 @@ fn main() {
         world
             .create_entity()
             .with(Player)
+            .with(Size {
+                width: 100.0,
+                height: 150.0,
+            })
             .with(Position { x: 10.0, y: 20.0 })
             .with(Tile {
                 texture_id: "sprites_texture".to_owned(),
@@ -38,6 +42,10 @@ fn main() {
             .build();
         world
             .create_entity()
+            .with(Size {
+                width: 100.0,
+                height: 100.0,
+            })
             .with(Position { x: 200.0, y: 125.0 })
             .with(Tile {
                 texture_id: "sprites_texture".to_owned(),
