@@ -1,11 +1,7 @@
-use glam::Vec3;
-use specs::{
-    storage::GenericWriteStorage, Entities, Read, ReadStorage, System, Write, WriteStorage,
-};
+use specs::{Entities, Read, ReadStorage, System, WriteStorage};
 use wgpu_core::ecs::{
     component::{player::Player, position::Position},
     resource::{
-        buffers::BuffersResource,
         delta_time::DeltaTimeResource,
         input::InputResource,
         state::{State, StateResource},
@@ -20,7 +16,6 @@ impl<'a> System<'a> for PlayerSystem {
         Read<'a, DeltaTimeResource>,
         Read<'a, InputResource>,
         Read<'a, StateResource>,
-        Write<'a, BuffersResource>,
         ReadStorage<'a, Player>,
         WriteStorage<'a, Position>,
     );
@@ -28,8 +23,7 @@ impl<'a> System<'a> for PlayerSystem {
     fn run(&mut self, data: Self::SystemData) {
         use specs::Join;
 
-        let (entities, delta_time_res, input_res, state_res, mut buffers_res, player, mut position) =
-            data;
+        let (entities, delta_time_res, input_res, state_res, player, mut position) = data;
 
         if state_res.state != State::RENDER {
             return;
@@ -53,7 +47,6 @@ impl<'a> System<'a> for PlayerSystem {
                     }
                 }
             }
-            buffers_res.camera = Vec3::new(-(player_pos.x - 350.0), -(player_pos.y - 250.0), 0.1)
         }
     }
 }

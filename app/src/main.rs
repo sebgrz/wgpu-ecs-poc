@@ -17,7 +17,7 @@ use wgpu_core::{
     window::{WindowApplication, WindowCalls},
 };
 
-use crate::system::player::PlayerSystem;
+use crate::system::{camera::CameraSystem, player::PlayerSystem};
 
 fn main() {
     let event_loop = EventLoop::new().unwrap();
@@ -52,6 +52,7 @@ fn main() {
     let mut dispatcher = DispatcherBuilder::new()
         .with(SceneLoader, "scene_loader", &[])
         .with(PlayerSystem, "player", &[])
+        .with(CameraSystem, "camera", &[])
         .with(PreSpriteBuffer, "pre_sprite_buffer", &[])
         .with(ReloadBuffers, "reload_buffers", &[])
         .build();
