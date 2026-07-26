@@ -1,3 +1,4 @@
+pub mod animation;
 pub mod init;
 pub mod pre_sprite_buffer;
 pub mod reload_buffers;

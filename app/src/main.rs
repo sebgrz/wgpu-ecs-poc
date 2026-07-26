@@ -13,11 +13,12 @@ use wgpu_core::{
             state::StateResource,
         },
         system::{
-            init::Init, pre_sprite_buffer::PreSpriteBuffer, reload_buffers::ReloadBuffers,
-            scene_loader::SceneLoader, sprite_renderer::SpriteRenderer,
+            animation::AnimationSystem, init::Init, pre_sprite_buffer::PreSpriteBuffer,
+            reload_buffers::ReloadBuffers, scene_loader::SceneLoader,
+            sprite_renderer::SpriteRenderer,
         },
     },
-    game_data::{GameData, StateData},
+    game_data::{SpriteAnimationData, GameData, SpriteKeyframeData, StateData},
     init_managers_and_resources,
     input::KeyboardInputAction,
     window::{WindowApplication, WindowCalls},
@@ -38,8 +39,9 @@ fn main() {
         .with(MenuSystem, "menu", &["scene_loader"])
         .with(PlayerSystem, "player", &["scene_loader"])
         .with(CameraSystem, "camera", &["menu", "player"])
-        .with(PreSpriteBuffer, "pre_sprite_buffer", &["camera"])
-        .with(ReloadBuffers, "reload_buffers", &["camera"])
+        .with(AnimationSystem, "animation", &["camera"])
+        .with(PreSpriteBuffer, "pre_sprite_buffer", &["animation"])
+        .with(ReloadBuffers, "reload_buffers", &["animation"])
         .build();
 
     let world_create = world.clone();
@@ -70,8 +72,52 @@ fn main() {
                     texture_file_path: "res/sprites.png".to_string(),
                 },
             );
+
+            let mut animations: HashMap<String, SpriteAnimationData> = HashMap::new();
+            animations.insert(
+                "player_move".to_string(),
+                SpriteAnimationData {
+                    looping: true,
+                    keyframes: vec![
+                        SpriteKeyframeData {
+                            tile: [30, 80, 60, 127],
+                            duration: 0.1,
+                        },
+                        SpriteKeyframeData {
+                            tile: [124, 80, 163, 127],
+                            duration: 0.1,
+                        },
+                        SpriteKeyframeData {
+                            tile: [219, 80, 259, 127],
+                            duration: 0.1,
+                        },
+                        SpriteKeyframeData {
+                            tile: [313, 80, 356, 127],
+                            duration: 0.1,
+                        },
+                        SpriteKeyframeData {
+                            tile: [412, 80, 449, 127],
+                            duration: 0.1,
+                        },
+                        SpriteKeyframeData {
+                            tile: [508, 80, 539, 127],
+                            duration: 0.1,
+                        },
+                        SpriteKeyframeData {
+                            tile: [610, 80, 637, 127],
+                            duration: 0.1,
+                        },
+                        SpriteKeyframeData {
+                            tile: [705, 80, 735, 127],
+                            duration: 0.1,
+                        },
+                    ],
+                },
+            );
+
             game_res.data = GameData {
                 state_data: state_data,
+                sprite_animations: animations,
             };
         }
 

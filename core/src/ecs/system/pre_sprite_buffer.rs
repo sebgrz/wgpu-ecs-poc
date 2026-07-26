@@ -2,7 +2,7 @@ use specs::{Read, ReadStorage, System, Write};
 
 use crate::{
     ecs::{
-        component::{position::Position, size::Size, tile::Tile},
+        component::{animation::Animation, position::Position, size::Size, tile::Tile},
         resource::{
             buffers::BuffersResource,
             managers::ManagersResource,
@@ -22,11 +22,12 @@ impl<'a> System<'a> for PreSpriteBuffer {
         ReadStorage<'a, Size>,
         ReadStorage<'a, Position>,
         ReadStorage<'a, Tile>,
+        ReadStorage<'a, Animation>,
     );
 
     fn run(&mut self, data: Self::SystemData) {
         use specs::Join;
-        let (managers_res, state_res, mut buffers_res, size, position, tile) = data;
+        let (managers_res, state_res, mut buffers_res, size, position, tile, animation) = data;
 
         if state_res.state != State::RENDER {
             return;
@@ -44,6 +45,19 @@ impl<'a> System<'a> for PreSpriteBuffer {
                     width: size.width,
                     height: size.height,
                     texture_clip: tile.into_tex_dimensions(tex_size.clone()),
+                };
+                buffers_res.sprites[count] = sprite;
+                count += 1;
+            }
+        }
+        for (size, position, animation) in (&size, &position, &animation).join() {
+            if let Some(tex_size) = tex_manager.borrow_size_cache(&animation.texture_id) {
+                let sprite = Sprite {
+                    x: position.x,
+                    y: position.y,
+                    width: size.width,
+                    height: size.height,
+                    texture_clip: animation.into_tex_dimensions(tex_size.clone()),
                 };
                 buffers_res.sprites[count] = sprite;
                 count += 1;
