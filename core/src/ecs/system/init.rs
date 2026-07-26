@@ -1,8 +1,9 @@
-use specs::{System, Write};
+use specs::{Read, System, Write};
 
 use crate::{
     ecs::{
-        resource::managers::ManagersResource, MAIN_SHADERS_ID, MENU_TEXTURE_ID, SPRITES_TEXTURE_ID,
+        resource::{game::GameResource, managers::ManagersResource},
+        MAIN_SHADERS_ID,
     },
     manager::asset_manager::AssetType,
 };
@@ -10,33 +11,28 @@ use crate::{
 pub struct Init;
 
 impl<'a> System<'a> for Init {
-    type SystemData = Write<'a, ManagersResource>;
+    type SystemData = (Read<'a, GameResource>, Write<'a, ManagersResource>);
 
     fn run(&mut self, data: Self::SystemData) {
-        let inner_managers = data.get_managers().unwrap();
+        let (game_res, managers_res) = data;
+        let inner_managers = managers_res.get_managers().unwrap();
         let mut assets_manager = inner_managers.assets_manager.write().unwrap();
 
         // init assets
-        assets_manager
-            .add(
-                SPRITES_TEXTURE_ID,
-                AssetType::Texture {
-                    path: "res/sprites.png".to_owned(),
-                    width: 0,
-                    height: 0,
-                },
-            )
-            .unwrap();
-        assets_manager
-            .add(
-                MENU_TEXTURE_ID,
-                AssetType::Texture {
-                    path: "res/menu_buttons_sprite.png".to_owned(),
-                    width: 0,
-                    height: 0,
-                },
-            )
-            .unwrap();
+
+        for state in game_res.data.state_data.values() {
+            assets_manager
+                .add(
+                    &state.texture_id,
+                    AssetType::Texture {
+                        path: state.texture_file_path.clone(),
+                        width: 0,
+                        height: 0,
+                    },
+                )
+                .unwrap();
+        }
+
         assets_manager
             .add(
                 MAIN_SHADERS_ID,

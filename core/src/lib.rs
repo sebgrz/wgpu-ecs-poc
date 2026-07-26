@@ -6,8 +6,9 @@ use crate::{
     ecs::{
         component::{player::Player, position::Position, size::Size, tile::Tile},
         resource::{
-            buffers::BuffersResource, delta_time::DeltaTimeResource, input::InputResource,
-            managers::ManagersResource, renderer::RendererResource, state::StateResource,
+            buffers::BuffersResource, delta_time::DeltaTimeResource, game::GameResource,
+            input::InputResource, managers::ManagersResource, renderer::RendererResource,
+            state::StateResource,
         },
     },
     manager::{
@@ -18,6 +19,7 @@ use crate::{
 };
 
 pub mod ecs;
+pub mod game_data;
 pub mod input;
 pub mod manager;
 pub mod renderer;
@@ -37,7 +39,7 @@ pub fn init() -> (SharedRenderer, SharedWorld) {
     (renderer.clone(), Arc::new(RwLock::new(world)))
 }
 
-pub fn init_managers(world: &mut World, renderer: SharedRenderer) {
+pub fn init_managers_and_resources(world: &mut World, renderer: SharedRenderer) {
     let asset_manager = Arc::new(RwLock::new(AssetManager::new()));
     let buffer_manager = Arc::new(RwLock::new(UniformBufferManager::new(renderer.clone())));
     let texture_manager = Arc::new(RwLock::new(TextureManager::new(renderer.clone())));
@@ -56,4 +58,5 @@ pub fn init_managers(world: &mut World, renderer: SharedRenderer) {
     world.insert(StateResource::default());
     world.insert(InputResource::default());
     world.insert(DeltaTimeResource::default());
+    world.insert(GameResource::default());
 }

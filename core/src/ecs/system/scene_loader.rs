@@ -1,14 +1,14 @@
 use glam::Vec3;
-use specs::{System, Write};
+use specs::{Read, System, Write};
 
 use crate::{
     ecs::{
         resource::{
+            game::GameResource,
             managers::ManagersResource,
             state::{State, StateResource},
         },
-        CAMERA_BUFFER_UNIFORM, MAIN_SHADERS_ID, MENU_TEXTURE_ID, SPRITES_BUFFER_UNIFORM,
-        SPRITES_RENDER_PIPELINE_ID, SPRITES_TEXTURE_ID,
+        CAMERA_BUFFER_UNIFORM, MAIN_SHADERS_ID, SPRITES_BUFFER_UNIFORM, SPRITES_RENDER_PIPELINE_ID,
     },
     uniform::sprite::Sprite,
 };
@@ -16,10 +16,14 @@ use crate::{
 pub struct SceneLoader;
 
 impl<'a> System<'a> for SceneLoader {
-    type SystemData = (Write<'a, ManagersResource>, Write<'a, StateResource>);
+    type SystemData = (
+        Read<'a, GameResource>,
+        Write<'a, ManagersResource>,
+        Write<'a, StateResource>,
+    );
 
     fn run(&mut self, data: Self::SystemData) {
-        let (managers_res, mut state_res) = data;
+        let (game_res, managers_res, mut state_res) = data;
         if state_res.state != State::SCENE {
             return;
         }
@@ -31,17 +35,10 @@ impl<'a> System<'a> for SceneLoader {
         let mut tex_manager = inner_managers.texture_manager.write().unwrap();
         tex_manager.unload_all().unwrap();
 
-        // TODO: temporarily - this should take from some configuration
-        if state_res.game_state == "MENU" {
-            tex_manager
-                .load_texture(&assets_manager, MENU_TEXTURE_ID)
-                .unwrap();
-        }
-        if state_res.game_state == "LEVEL" {
-            tex_manager
-                .load_texture(&assets_manager, SPRITES_TEXTURE_ID)
-                .unwrap();
-        }
+        let tex_id = game_res.data.state_data[&state_res.game_state]
+            .texture_id
+            .clone();
+        tex_manager.load_texture(&assets_manager, &tex_id).unwrap();
 
         // prepare uniforms
         let mut uniform_buffer_manager = inner_managers.uniform_buffer_manager.write().unwrap();

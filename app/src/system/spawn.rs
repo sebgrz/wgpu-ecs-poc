@@ -4,9 +4,12 @@ use wgpu_core::ecs::{
     component::{player::Player, position::Position, size::Size, tile::Tile},
     resource::state::{State, StateResource},
 };
-use wgpu_core::ecs::{MENU_TEXTURE_ID, SPRITES_TEXTURE_ID};
 
 use crate::game::state::GameState;
+
+// TODO: temporarily
+static SPRITES_TEXTURE_ID: &str = "sprites_texture";
+static MENU_TEXTURE_ID: &str = "menu_texture";
 
 pub(crate) struct SpawnSystem;
 

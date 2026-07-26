@@ -5,12 +5,12 @@ use crate::{
     ecs::{
         resource::{
             buffers::BuffersResource,
+            game::GameResource,
             managers::ManagersResource,
             renderer::RendererResource,
             state::{State, StateResource},
         },
-        CAMERA_BUFFER_UNIFORM, MENU_TEXTURE_ID, SPRITES_BUFFER_UNIFORM, SPRITES_RENDER_PIPELINE_ID,
-        SPRITES_TEXTURE_ID,
+        CAMERA_BUFFER_UNIFORM, SPRITES_BUFFER_UNIFORM, SPRITES_RENDER_PIPELINE_ID,
     },
     manager::texture_manager::TextureObject,
 };
@@ -19,6 +19,7 @@ pub struct SpriteRenderer;
 
 impl<'a> System<'a> for SpriteRenderer {
     type SystemData = (
+        Read<'a, GameResource>,
         Read<'a, ManagersResource>,
         Read<'a, RendererResource>,
         Read<'a, BuffersResource>,
@@ -26,7 +27,13 @@ impl<'a> System<'a> for SpriteRenderer {
     );
 
     fn run(&mut self, data: Self::SystemData) {
-        let (managers_resource, renderer_resource, sprites_buffer_resources, state_res) = data;
+        let (
+            game_resource,
+            managers_resource,
+            renderer_resource,
+            sprites_buffer_resources,
+            state_res,
+        ) = data;
 
         if state_res.state != State::RENDER {
             return;
@@ -46,16 +53,10 @@ impl<'a> System<'a> for SpriteRenderer {
             .unwrap();
 
         // texture
-        // TODO: get textures from level_manager
-        let texture_obj: &TextureObject = match state_res.game_state.as_str() {
-            "MENU" => Some(tex_manager.borrow_object(MENU_TEXTURE_ID)),
-            "LEVEL" => Some(tex_manager.borrow_object(SPRITES_TEXTURE_ID)),
-            _ => None,
-        }
-        .unwrap();
+        let texture_obj: &TextureObject = tex_manager
+            .borrow_object(&game_resource.data.state_data[&state_res.game_state].texture_id);
 
         // prepare pipeline
-
         if let Some(render_pipeline) = pipeline_manager.borrow_pipeline(SPRITES_RENDER_PIPELINE_ID)
         {
             if let Some(arc_renderer) = &renderer_resource.renderer {

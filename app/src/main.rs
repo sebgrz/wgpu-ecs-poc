@@ -1,18 +1,24 @@
 mod game;
 mod system;
 
+use std::collections::HashMap;
+
 use winit::event_loop::EventLoop;
 
 use specs::{Builder, DispatcherBuilder, RunNow, WorldExt};
 use wgpu_core::{
     ecs::{
-        resource::{delta_time::DeltaTimeResource, input::InputResource, state::StateResource},
+        resource::{
+            delta_time::DeltaTimeResource, game::GameResource, input::InputResource,
+            state::StateResource,
+        },
         system::{
             init::Init, pre_sprite_buffer::PreSpriteBuffer, reload_buffers::ReloadBuffers,
             scene_loader::SceneLoader, sprite_renderer::SpriteRenderer,
         },
     },
-    init_managers,
+    game_data::{GameData, StateData},
+    init_managers_and_resources,
     input::KeyboardInputAction,
     window::{WindowApplication, WindowCalls},
 };
@@ -42,9 +48,32 @@ fn main() {
         let mut world = world_create.write().unwrap();
         let renderer = renderer_create.clone();
 
-        init_managers(&mut world, renderer);
+        init_managers_and_resources(&mut world, renderer);
         let mut state_res = world.write_resource::<StateResource>();
         state_res.game_state = GameState::MENU.to_string();
+
+        // TODO: temporarily
+        {
+            let mut game_res = world.write_resource::<GameResource>();
+            let mut state_data: HashMap<String, StateData> = HashMap::new();
+            state_data.insert(
+                "MENU".to_string(),
+                StateData {
+                    texture_id: "menu_texture".to_string(),
+                    texture_file_path: "res/menu_buttons_sprite.png".to_string(),
+                },
+            );
+            state_data.insert(
+                "LEVEL".to_string(),
+                StateData {
+                    texture_id: "sprites_texture".to_string(),
+                    texture_file_path: "res/sprites.png".to_string(),
+                },
+            );
+            game_res.data = GameData {
+                state_data: state_data,
+            };
+        }
 
         let mut init_sys = Init;
         init_sys.run_now(&world);
