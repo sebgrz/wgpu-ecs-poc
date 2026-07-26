@@ -1,4 +1,4 @@
-use glam::Vec3;
+use glam::Mat4;
 use specs::{Read, System, Write};
 
 use crate::{
@@ -45,7 +45,7 @@ impl<'a> System<'a> for SceneLoader {
         uniform_buffer_manager.cleanup_all();
 
         uniform_buffer_manager.create::<Sprite>(SPRITES_BUFFER_UNIFORM, 1024);
-        uniform_buffer_manager.create::<Vec3>(CAMERA_BUFFER_UNIFORM, 1);
+        uniform_buffer_manager.create::<Mat4>(CAMERA_BUFFER_UNIFORM, 1);
 
         // prepare pipeline
         let (_, sprites_buffer_uniform_bind_group_layout) = uniform_buffer_manager

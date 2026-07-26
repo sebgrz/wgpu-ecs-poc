@@ -3,7 +3,7 @@ use std::collections::HashMap;
 #[derive(Default)]
 pub struct GameData {
     pub state_data: HashMap<String, StateData>,
-    pub sprite_animations: HashMap<String, SpriteAnimationData>
+    pub sprite_animations: HashMap<String, SpriteAnimationData>,
 }
 
 pub struct StateData {
@@ -13,7 +13,7 @@ pub struct StateData {
 
 pub struct SpriteAnimationData {
     pub looping: bool,
-    pub keyframes: Vec<SpriteKeyframeData>
+    pub keyframes: Vec<SpriteKeyframeData>,
 }
 
 pub struct SpriteKeyframeData {

@@ -1,11 +1,11 @@
 use std::array;
 
-use glam::Vec3;
+use glam::Mat4;
 
 use crate::uniform::sprite::Sprite;
 
 pub struct BuffersResource {
-    pub camera: Vec3,
+    pub camera: Mat4,
     pub sprites: [Sprite; 1024],
     pub sprites_size: usize,
 }
@@ -13,7 +13,7 @@ pub struct BuffersResource {
 impl Default for BuffersResource {
     fn default() -> Self {
         Self {
-            camera: Vec3::ZERO,
+            camera: Mat4::ZERO,
             sprites: array::from_fn(|_| Sprite::default()),
             sprites_size: 0,
         }

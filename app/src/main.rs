@@ -18,7 +18,7 @@ use wgpu_core::{
             sprite_renderer::SpriteRenderer,
         },
     },
-    game_data::{SpriteAnimationData, GameData, SpriteKeyframeData, StateData},
+    game_data::{GameData, SpriteAnimationData, SpriteKeyframeData, StateData},
     init_managers_and_resources,
     input::KeyboardInputAction,
     window::{WindowApplication, WindowCalls},
