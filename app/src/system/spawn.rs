@@ -1,5 +1,6 @@
 use specs::Join;
 use specs::{Entities, Entity, Read, System, WriteStorage};
+use wgpu_core::ecs::component::animation::Animation;
 use wgpu_core::ecs::component::sprite_animation::SpriteAnimation;
 use wgpu_core::ecs::{
     component::{player::Player, position::Position, size::Size, tile::Tile},
@@ -23,10 +24,19 @@ impl<'a> System<'a> for SpawnSystem {
         WriteStorage<'a, Tile>,
         WriteStorage<'a, Player>,
         WriteStorage<'a, SpriteAnimation>,
+        WriteStorage<'a, Animation>,
     );
     fn run(&mut self, data: Self::SystemData) {
-        let (entities, state_res, mut position, mut size, mut tile, mut player, mut animation) =
-            data;
+        let (
+            entities,
+            state_res,
+            mut position,
+            mut size,
+            mut tile,
+            mut player,
+            mut sprite_animation,
+            mut animation,
+        ) = data;
         if state_res.state != State::SCENE {
             return;
         }
@@ -46,7 +56,15 @@ impl<'a> System<'a> for SpawnSystem {
                     },
                     &mut size,
                 )
-                .with(Position { x: 255.0, y: 255.0 }, &mut position)
+                .with(Position { x: 0.0, y: 0.0 }, &mut position)
+                .with(
+                    Animation {
+                        animation_id: "menu_button_move".to_string(),
+                        current_duration: 0.0,
+                        current_frame: 0,
+                    },
+                    &mut animation,
+                )
                 .with(
                     Tile {
                         texture_id: MENU_TEXTURE_ID.to_owned(),
@@ -81,7 +99,7 @@ impl<'a> System<'a> for SpawnSystem {
                         current_tile: None,
                         is_reversed: false,
                     },
-                    &mut animation,
+                    &mut sprite_animation,
                 )
                 .build();
 

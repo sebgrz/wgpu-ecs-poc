@@ -18,7 +18,9 @@ use wgpu_core::{
             sprite_renderer::SpriteRenderer,
         },
     },
-    game_data::{GameData, SpriteAnimationData, SpriteKeyframeData, StateData},
+    game_data::{
+        AnimationData, GameData, KeyframeData, SpriteAnimationData, SpriteKeyframeData, StateData,
+    },
     init_managers_and_resources,
     input::KeyboardInputAction,
     window::{WindowApplication, WindowCalls},
@@ -73,8 +75,20 @@ fn main() {
                 },
             );
 
-            let mut animations: HashMap<String, SpriteAnimationData> = HashMap::new();
+            let mut animations: HashMap<String, AnimationData> = HashMap::new();
             animations.insert(
+                "menu_button_move".to_string(),
+                AnimationData {
+                    looping: false,
+                    keyframes: vec![KeyframeData {
+                        start_pos: [0.0, 0.0],
+                        end_pos: [255.0, 255.0],
+                        duration: 1.5,
+                    }],
+                },
+            );
+            let mut sprite_animations: HashMap<String, SpriteAnimationData> = HashMap::new();
+            sprite_animations.insert(
                 "player_move".to_string(),
                 SpriteAnimationData {
                     looping: true,
@@ -117,7 +131,8 @@ fn main() {
 
             game_res.data = GameData {
                 state_data: state_data,
-                sprite_animations: animations,
+                sprite_animations,
+                animations,
             };
         }
 
