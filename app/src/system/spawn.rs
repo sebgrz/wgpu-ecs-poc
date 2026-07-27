@@ -54,6 +54,7 @@ impl<'a> System<'a> for SpawnSystem {
                         y: 0,
                         x2: 580,
                         y2: 180,
+                        is_reversed: false,
                     },
                     &mut tile,
                 )
@@ -78,6 +79,7 @@ impl<'a> System<'a> for SpawnSystem {
                         current_frame: 0,
                         current_duration: 0.0,
                         current_tile: None,
+                        is_reversed: false,
                     },
                     &mut animation,
                 )
@@ -100,6 +102,7 @@ impl<'a> System<'a> for SpawnSystem {
                         y: 5,
                         x2: 27,
                         y2: 16,
+                        is_reversed: false,
                     },
                     &mut tile,
                 )

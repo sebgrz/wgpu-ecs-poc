@@ -1,6 +1,7 @@
+// struct size should be multiplicity of 16 bytes
 struct Sprite {
   rect: vec4<f32>,
-  tex_clip: vec4<f32>
+  tex_clip: vec4<f32>,
 }
 
 struct VertexOutput {
