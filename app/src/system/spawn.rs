@@ -1,6 +1,6 @@
 use specs::Join;
 use specs::{Entities, Entity, Read, System, WriteStorage};
-use wgpu_core::ecs::component::animation::Animation;
+use wgpu_core::ecs::component::sprite_animation::SpriteAnimation;
 use wgpu_core::ecs::{
     component::{player::Player, position::Position, size::Size, tile::Tile},
     resource::state::{State, StateResource},
@@ -22,7 +22,7 @@ impl<'a> System<'a> for SpawnSystem {
         WriteStorage<'a, Size>,
         WriteStorage<'a, Tile>,
         WriteStorage<'a, Player>,
-        WriteStorage<'a, Animation>,
+        WriteStorage<'a, SpriteAnimation>,
     );
     fn run(&mut self, data: Self::SystemData) {
         let (entities, state_res, mut position, mut size, mut tile, mut player, mut animation) =
@@ -73,7 +73,7 @@ impl<'a> System<'a> for SpawnSystem {
                 )
                 .with(Position { x: 10.0, y: 20.0 }, &mut position)
                 .with(
-                    Animation {
+                    SpriteAnimation {
                         texture_id: "sprites_texture".to_owned(),
                         animation_id: "player_move".to_string(),
                         current_frame: 0,

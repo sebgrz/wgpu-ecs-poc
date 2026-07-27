@@ -2,7 +2,7 @@ use specs::{Component, VecStorage};
 
 #[derive(Component)]
 #[storage(VecStorage)]
-pub struct Animation {
+pub struct SpriteAnimation {
     pub texture_id: String,
     pub animation_id: String,
     pub current_frame: usize,
@@ -11,7 +11,7 @@ pub struct Animation {
     pub is_reversed: bool,
 }
 
-impl Animation {
+impl SpriteAnimation {
     pub fn into_tex_dimensions(&self, tex_size: (u32, u32)) -> [f32; 4] {
         let tile = self.current_tile.unwrap();
         if self.is_reversed {

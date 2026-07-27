@@ -2,7 +2,7 @@ use specs::Join;
 use specs::{Read, System, WriteStorage};
 
 use crate::ecs::resource::delta_time::DeltaTimeResource;
-use crate::ecs::{component::animation::Animation, resource::game::GameResource};
+use crate::ecs::{component::sprite_animation::SpriteAnimation, resource::game::GameResource};
 
 pub struct AnimationSystem;
 
@@ -10,7 +10,7 @@ impl<'a> System<'a> for AnimationSystem {
     type SystemData = (
         Read<'a, GameResource>,
         Read<'a, DeltaTimeResource>,
-        WriteStorage<'a, Animation>,
+        WriteStorage<'a, SpriteAnimation>,
     );
 
     fn run(&mut self, data: Self::SystemData) {

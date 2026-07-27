@@ -2,7 +2,9 @@ use specs::{Read, ReadStorage, System, Write};
 
 use crate::{
     ecs::{
-        component::{animation::Animation, position::Position, size::Size, tile::Tile},
+        component::{
+            position::Position, size::Size, sprite_animation::SpriteAnimation, tile::Tile,
+        },
         resource::{
             buffers::BuffersResource,
             managers::ManagersResource,
@@ -22,7 +24,7 @@ impl<'a> System<'a> for PreSpriteBuffer {
         ReadStorage<'a, Size>,
         ReadStorage<'a, Position>,
         ReadStorage<'a, Tile>,
-        ReadStorage<'a, Animation>,
+        ReadStorage<'a, SpriteAnimation>,
     );
 
     fn run(&mut self, data: Self::SystemData) {
