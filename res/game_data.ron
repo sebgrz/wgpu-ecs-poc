@@ -8,7 +8,7 @@
                     components: [
                         (type: "Size", width: 290.0, height: 90.0),
                         (type: "Position", x: 0.0, y: 0.0),
-                        (type: "Animation", animation_id: "menu_button_move", current_frame: 0, current_duration: 0.0),
+                        (type: "Animation", animation_id: "menu_button_move"),
                         (type: "Tile", texture_id: "menu_texture", x: 0, y: 0, x2: 580, y2: 180, is_reversed: false),
                     ]
                 ),
@@ -36,6 +36,13 @@
         ),
     },
     animations: {
+        "item_1_move": (
+            looping: true,
+            keyframes: [
+                (start_pos: (200.0, 125.0), end_pos: (555.0, 125.0), duration: 5.5),
+                (start_pos: (555.0, 125.0), end_pos: (200.0, 125.0), duration: 5.5),
+            ],
+        ),
         "menu_button_move": (
             looping: false,
             keyframes: [

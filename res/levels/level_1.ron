@@ -20,6 +20,7 @@
             components: [
                 (type: "Size", width: 100.0, height: 100.0),
                 (type: "Position", x: 200.0, y: 125.0),
+                (type: "Animation", animation_id: "item_1_move"),
                 (
                     type: "Tile",
                     texture_id: "sprites_texture",
