@@ -63,5 +63,10 @@ var tex_sampler: sampler;
 
 @fragment
 fn fs_main(in: VertexOutput) -> @location(0) vec4<f32> {
-    return textureSample(texture, tex_sampler, in.tex_coords);
+    let color = textureSample(texture, tex_sampler, in.tex_coords);
+    let diff = distance(color.rgb, vec3<f32>(0.0, 0.0, 0.0));
+    if (diff < 0.05) {
+      discard;
+    }
+    return color;
 }
