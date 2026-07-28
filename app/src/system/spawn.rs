@@ -1,42 +1,24 @@
 use specs::Join;
-use specs::{Entities, Entity, Read, System, WriteStorage};
-use wgpu_core::ecs::component::animation::Animation;
-use wgpu_core::ecs::component::sprite_animation::SpriteAnimation;
-use wgpu_core::ecs::{
-    component::{player::Player, position::Position, size::Size, tile::Tile},
-    resource::state::{State, StateResource},
-};
+use specs::{Entities, Entity, LazyUpdate, Read, System};
+use wgpu_core::ecs::extensions::ECSExtensions;
+use wgpu_core::ecs::resource::game::GameResource;
+use wgpu_core::ecs::resource::managers::ManagersResource;
+use wgpu_core::ecs::resource::state::{State, StateResource};
 
 use crate::game::state::GameState;
-
-// TODO: temporarily
-static SPRITES_TEXTURE_ID: &str = "sprites_texture";
-static MENU_TEXTURE_ID: &str = "menu_texture";
 
 pub(crate) struct SpawnSystem;
 
 impl<'a> System<'a> for SpawnSystem {
     type SystemData = (
         Entities<'a>,
+        Read<'a, LazyUpdate>,
         Read<'a, StateResource>,
-        WriteStorage<'a, Position>,
-        WriteStorage<'a, Size>,
-        WriteStorage<'a, Tile>,
-        WriteStorage<'a, Player>,
-        WriteStorage<'a, SpriteAnimation>,
-        WriteStorage<'a, Animation>,
+        Read<'a, ManagersResource>,
+        Read<'a, GameResource>,
     );
     fn run(&mut self, data: Self::SystemData) {
-        let (
-            entities,
-            state_res,
-            mut position,
-            mut size,
-            mut tile,
-            mut player,
-            mut sprite_animation,
-            mut animation,
-        ) = data;
+        let (entities, lazy_update_res, state_res, managers_res, game_res) = data;
         if state_res.state != State::SCENE {
             return;
         }
@@ -44,87 +26,20 @@ impl<'a> System<'a> for SpawnSystem {
         for entity in to_delete {
             entities.delete(entity).expect("delete entities");
         }
+        let managers = managers_res.get_managers().unwrap();
+        let file_manager = managers.file_manager.read().unwrap();
 
         // create entities
         if state_res.game_state == GameState::MENU.to_string() {
-            entities
-                .build_entity()
-                .with(
-                    Size {
-                        width: 290.0,
-                        height: 90.0,
-                    },
-                    &mut size,
-                )
-                .with(Position { x: 0.0, y: 0.0 }, &mut position)
-                .with(
-                    Animation {
-                        animation_id: "menu_button_move".to_string(),
-                        current_duration: 0.0,
-                        current_frame: 0,
-                    },
-                    &mut animation,
-                )
-                .with(
-                    Tile {
-                        texture_id: MENU_TEXTURE_ID.to_owned(),
-                        x: 0,
-                        y: 0,
-                        x2: 580,
-                        y2: 180,
-                        is_reversed: false,
-                    },
-                    &mut tile,
-                )
-                .build();
+            ECSExtensions::spawn_entities(
+                &entities,
+                &lazy_update_res,
+                &game_res.data.state_data[&state_res.game_state].entities,
+            );
         }
         if state_res.game_state == GameState::LEVEL.to_string() {
-            entities
-                .build_entity()
-                .with(Player, &mut player)
-                .with(
-                    Size {
-                        width: 100.0,
-                        height: 150.0,
-                    },
-                    &mut size,
-                )
-                .with(Position { x: 10.0, y: 20.0 }, &mut position)
-                .with(
-                    SpriteAnimation {
-                        texture_id: "sprites_texture".to_owned(),
-                        animation_id: "player_move".to_string(),
-                        current_frame: 0,
-                        current_duration: 0.0,
-                        current_tile: None,
-                        is_reversed: false,
-                    },
-                    &mut sprite_animation,
-                )
-                .build();
-
-            entities
-                .build_entity()
-                .with(
-                    Size {
-                        width: 100.0,
-                        height: 100.0,
-                    },
-                    &mut size,
-                )
-                .with(Position { x: 200.0, y: 125.0 }, &mut position)
-                .with(
-                    Tile {
-                        texture_id: "sprites_texture".to_owned(),
-                        x: 19,
-                        y: 5,
-                        x2: 27,
-                        y2: 16,
-                        is_reversed: false,
-                    },
-                    &mut tile,
-                )
-                .build();
+            let level = file_manager.load_level(1);
+            ECSExtensions::spawn_entities(&entities, &lazy_update_res, &level.entities);
         }
     }
 }

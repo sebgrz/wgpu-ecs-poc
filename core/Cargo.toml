@@ -14,3 +14,5 @@ wgpu = "29.0.1"
 pollster = "0.4.0"
 image = "0.25.6"
 bytemuck = "1.25.0"
+ron = "0.12.2"
+serde = { version = "1.0.229", features = ["derive"] }

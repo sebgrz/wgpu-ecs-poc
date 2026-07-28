@@ -1,0 +1,46 @@
+(
+    state_data: {
+        "MENU": (
+            texture_id: "menu_texture",
+            texture_file_path: "res/menu_buttons_sprite.png",
+            entities: [
+                (
+                    components: [
+                        (type: "Size", width: 290.0, height: 90.0),
+                        (type: "Position", x: 0.0, y: 0.0),
+                        (type: "Animation", animation_id: "menu_button_move", current_frame: 0, current_duration: 0.0),
+                        (type: "Tile", texture_id: "menu_texture", x: 0, y: 0, x2: 580, y2: 180, is_reversed: false),
+                    ]
+                ),
+            ]
+        ),
+        "LEVEL": (
+            texture_id: "sprites_texture",
+            texture_file_path: "res/sprites.png",
+            entities: [],
+        ),
+    },
+    sprite_animations: {
+        "player_move": (
+            looping: true,
+            keyframes: [
+                (tile: (30, 80, 60, 127), duration: 0.1),
+                (tile: (124, 80, 163, 127), duration: 0.1),
+                (tile: (219, 80, 259, 127), duration: 0.1),
+                (tile: (313, 80, 356, 127), duration: 0.1),
+                (tile: (412, 80, 449, 127), duration: 0.1),
+                (tile: (508, 80, 539, 127), duration: 0.1),
+                (tile: (610, 80, 637, 127), duration: 0.1),
+                (tile: (705, 80, 735, 127), duration: 0.1),
+            ],
+        ),
+    },
+    animations: {
+        "menu_button_move": (
+            looping: false,
+            keyframes: [
+                (start_pos: (0.0, 0.0), end_pos: (255.0, 255.0), duration: 1.5),
+            ],
+        ),
+    },
+)

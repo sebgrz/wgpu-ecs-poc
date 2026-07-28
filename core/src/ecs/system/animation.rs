@@ -2,11 +2,11 @@ use glam::Vec2;
 use specs::Join;
 use specs::{Read, System, WriteStorage};
 
+use crate::data::game_data::KeyframeData;
 use crate::ecs::component::animation::Animation;
 use crate::ecs::component::position::Position;
 use crate::ecs::resource::delta_time::DeltaTimeResource;
 use crate::ecs::{component::sprite_animation::SpriteAnimation, resource::game::GameResource};
-use crate::game_data::KeyframeData;
 
 pub struct AnimationSystem;
 

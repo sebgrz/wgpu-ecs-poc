@@ -1,4 +1,4 @@
-use crate::game_data::GameData;
+use crate::data::game_data::GameData;
 
 #[derive(Default)]
 pub struct GameResource {

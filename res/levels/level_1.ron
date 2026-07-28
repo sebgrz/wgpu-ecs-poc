@@ -1,0 +1,35 @@
+(
+    name: "Test",
+    entities: [
+        // ENTITY 1: Player
+        (
+            components: [
+                (type: "Player"),
+                (type: "Size", width: 100.0, height: 150.0),
+                (type: "Position", x: 10.0, y: 20.0),
+                (
+                    type: "SpriteAnimation",
+                    texture_id: "sprites_texture",
+                    animation_id: "player_move",
+                    is_reversed: false,
+                ),
+            ],
+        ),
+        // ENTITY 2: Item
+        (
+            components: [
+                (type: "Size", width: 100.0, height: 100.0),
+                (type: "Position", x: 200.0, y: 125.0),
+                (
+                    type: "Tile",
+                    texture_id: "sprites_texture",
+                    x: 19,
+                    y: 5,
+                    x2: 27,
+                    y2: 16,
+                    is_reversed: false,
+                ),
+            ],
+        ),
+    ],
+)

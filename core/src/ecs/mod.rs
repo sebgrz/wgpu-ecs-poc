@@ -1,4 +1,5 @@
 pub mod component;
+pub mod extensions;
 pub mod resource;
 pub mod system;
 

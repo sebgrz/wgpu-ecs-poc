@@ -1,8 +1,6 @@
 mod game;
 mod system;
 
-use std::collections::HashMap;
-
 use winit::event_loop::EventLoop;
 
 use specs::{Builder, DispatcherBuilder, RunNow, WorldExt};
@@ -10,16 +8,13 @@ use wgpu_core::{
     ecs::{
         resource::{
             delta_time::DeltaTimeResource, game::GameResource, input::InputResource,
-            state::StateResource,
+            managers::ManagersResource, state::StateResource,
         },
         system::{
             animation::AnimationSystem, init::Init, pre_sprite_buffer::PreSpriteBuffer,
             reload_buffers::ReloadBuffers, scene_loader::SceneLoader,
             sprite_renderer::SpriteRenderer,
         },
-    },
-    game_data::{
-        AnimationData, GameData, KeyframeData, SpriteAnimationData, SpriteKeyframeData, StateData,
     },
     init_managers_and_resources,
     input::KeyboardInputAction,
@@ -56,84 +51,19 @@ fn main() {
         let mut state_res = world.write_resource::<StateResource>();
         state_res.game_state = GameState::MENU.to_string();
 
-        // TODO: temporarily
         {
+            let managers = world.read_resource::<ManagersResource>();
             let mut game_res = world.write_resource::<GameResource>();
-            let mut state_data: HashMap<String, StateData> = HashMap::new();
-            state_data.insert(
-                "MENU".to_string(),
-                StateData {
-                    texture_id: "menu_texture".to_string(),
-                    texture_file_path: "res/menu_buttons_sprite.png".to_string(),
-                },
-            );
-            state_data.insert(
-                "LEVEL".to_string(),
-                StateData {
-                    texture_id: "sprites_texture".to_string(),
-                    texture_file_path: "res/sprites.png".to_string(),
-                },
-            );
 
-            let mut animations: HashMap<String, AnimationData> = HashMap::new();
-            animations.insert(
-                "menu_button_move".to_string(),
-                AnimationData {
-                    looping: false,
-                    keyframes: vec![KeyframeData {
-                        start_pos: [0.0, 0.0],
-                        end_pos: [255.0, 255.0],
-                        duration: 1.5,
-                    }],
-                },
-            );
-            let mut sprite_animations: HashMap<String, SpriteAnimationData> = HashMap::new();
-            sprite_animations.insert(
-                "player_move".to_string(),
-                SpriteAnimationData {
-                    looping: true,
-                    keyframes: vec![
-                        SpriteKeyframeData {
-                            tile: [30, 80, 60, 127],
-                            duration: 0.1,
-                        },
-                        SpriteKeyframeData {
-                            tile: [124, 80, 163, 127],
-                            duration: 0.1,
-                        },
-                        SpriteKeyframeData {
-                            tile: [219, 80, 259, 127],
-                            duration: 0.1,
-                        },
-                        SpriteKeyframeData {
-                            tile: [313, 80, 356, 127],
-                            duration: 0.1,
-                        },
-                        SpriteKeyframeData {
-                            tile: [412, 80, 449, 127],
-                            duration: 0.1,
-                        },
-                        SpriteKeyframeData {
-                            tile: [508, 80, 539, 127],
-                            duration: 0.1,
-                        },
-                        SpriteKeyframeData {
-                            tile: [610, 80, 637, 127],
-                            duration: 0.1,
-                        },
-                        SpriteKeyframeData {
-                            tile: [705, 80, 735, 127],
-                            duration: 0.1,
-                        },
-                    ],
-                },
-            );
+            let file_manager = managers
+                .get_managers()
+                .unwrap()
+                .file_manager
+                .read()
+                .unwrap();
+            let game_data = file_manager.load_game_data();
 
-            game_res.data = GameData {
-                state_data: state_data,
-                sprite_animations,
-                animations,
-            };
+            game_res.data = game_data;
         }
 
         let mut init_sys = Init;

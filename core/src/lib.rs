@@ -15,14 +15,14 @@ use crate::{
         },
     },
     manager::{
-        asset_manager::AssetManager, pipeline_manager::PipelineManager,
+        asset_manager::AssetManager, file_manager::FileManager, pipeline_manager::PipelineManager,
         texture_manager::TextureManager, uniform_buffer_manager::UniformBufferManager,
     },
     renderer::{Renderer, SharedRenderer},
 };
 
+pub mod data;
 pub mod ecs;
-pub mod game_data;
 pub mod input;
 pub mod manager;
 pub mod renderer;
@@ -49,12 +49,14 @@ pub fn init_managers_and_resources(world: &mut World, renderer: SharedRenderer) 
     let buffer_manager = Arc::new(RwLock::new(UniformBufferManager::new(renderer.clone())));
     let texture_manager = Arc::new(RwLock::new(TextureManager::new(renderer.clone())));
     let pipeline_manager = Arc::new(RwLock::new(PipelineManager::new(renderer.clone())));
+    let file_manager = Arc::new(RwLock::new(FileManager::new()));
 
     world.insert(ManagersResource::new(
         asset_manager,
         texture_manager,
         buffer_manager,
         pipeline_manager,
+        file_manager,
     ));
     world.insert(RendererResource {
         renderer: Some(renderer.clone()),

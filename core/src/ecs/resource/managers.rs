@@ -1,6 +1,7 @@
 use crate::manager::{
-    asset_manager::SharedAssetsManager, pipeline_manager::SharedPipelineManager,
-    texture_manager::SharedTextureManager, uniform_buffer_manager::SharedUniformBufferManager,
+    asset_manager::SharedAssetsManager, file_manager::ShareFileManager,
+    pipeline_manager::SharedPipelineManager, texture_manager::SharedTextureManager,
+    uniform_buffer_manager::SharedUniformBufferManager,
 };
 
 pub struct InnerManagersResource {
@@ -8,6 +9,7 @@ pub struct InnerManagersResource {
     pub texture_manager: SharedTextureManager,
     pub uniform_buffer_manager: SharedUniformBufferManager,
     pub pipeline_manager: SharedPipelineManager,
+    pub file_manager: ShareFileManager,
 }
 
 #[derive(Default)]
@@ -21,6 +23,7 @@ impl ManagersResource {
         texture_manager: SharedTextureManager,
         uniform_buffer_manager: SharedUniformBufferManager,
         pipeline_manager: SharedPipelineManager,
+        file_manager: ShareFileManager,
     ) -> Self {
         Self {
             inner: Some(InnerManagersResource {
@@ -28,6 +31,7 @@ impl ManagersResource {
                 texture_manager,
                 uniform_buffer_manager,
                 pipeline_manager,
+                file_manager,
             }),
         }
     }
