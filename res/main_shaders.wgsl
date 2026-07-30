@@ -13,8 +13,8 @@ struct VertexOutput {
 @binding(0)
 var<uniform> sprites: array<Sprite, 1024>;
 
-@group(2)
-@binding(0)
+@group(1)
+@binding(1)
 var<uniform> camera: mat4x4<f32>;
 
 @vertex

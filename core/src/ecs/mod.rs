@@ -3,6 +3,9 @@ pub mod extensions;
 pub mod resource;
 pub mod system;
 
+// bind groups
+pub(crate) static BIND_GROUP_MAIN_BUFFERS: &str = "bind_group_main_buffers";
+
 // buffers
 pub(crate) static SPRITES_BUFFER_UNIFORM: &str = "sprites_buffer";
 pub(crate) static CAMERA_BUFFER_UNIFORM: &str = "camera_buffer";

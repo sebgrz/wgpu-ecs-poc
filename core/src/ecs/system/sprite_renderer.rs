@@ -10,7 +10,8 @@ use crate::{
             renderer::RendererResource,
             state::{State, StateResource},
         },
-        CAMERA_BUFFER_UNIFORM, SPRITES_BUFFER_UNIFORM, SPRITES_RENDER_PIPELINE_ID,
+        BIND_GROUP_MAIN_BUFFERS,
+        SPRITES_RENDER_PIPELINE_ID,
     },
     manager::texture_manager::TextureObject,
 };
@@ -45,11 +46,8 @@ impl<'a> System<'a> for SpriteRenderer {
         let tex_manager = inner_mangers.texture_manager.read().unwrap();
 
         // bind groups
-        let (sprites_bind_group, _) = uniform_buffer_manager
-            .borrow_bind_group(SPRITES_BUFFER_UNIFORM)
-            .unwrap();
-        let (camera_bind_group, _) = uniform_buffer_manager
-            .borrow_bind_group(CAMERA_BUFFER_UNIFORM)
+        let (main_buffers_bind_group, _) = uniform_buffer_manager
+            .borrow_bind_group(BIND_GROUP_MAIN_BUFFERS)
             .unwrap();
 
         // texture
@@ -95,8 +93,7 @@ impl<'a> System<'a> for SpriteRenderer {
 
                     render_pass.set_pipeline(render_pipeline);
                     render_pass.set_bind_group(0, Some(&texture_obj.bind_group), &[]);
-                    render_pass.set_bind_group(1, Some(sprites_bind_group), &[]);
-                    render_pass.set_bind_group(2, Some(camera_bind_group), &[]);
+                    render_pass.set_bind_group(1, Some(main_buffers_bind_group), &[]);
 
                     render_pass.draw(0..6, 0..sprites_buffer_resources.sprites_size as u32);
                     // End the renderpass.

@@ -6,7 +6,7 @@ use crate::ecs::{
         managers::ManagersResource,
         state::{State, StateResource},
     },
-    CAMERA_BUFFER_UNIFORM, SPRITES_BUFFER_UNIFORM,
+    BIND_GROUP_MAIN_BUFFERS, CAMERA_BUFFER_UNIFORM, SPRITES_BUFFER_UNIFORM,
 };
 
 pub struct ReloadBuffers;
@@ -31,8 +31,16 @@ impl<'a> System<'a> for ReloadBuffers {
         let sprites = buffers_resources.sprites;
         let fragment_sprites = &sprites[0..buffers_resources.sprites_size];
 
-        uniform_buffer_manager
-            .write_from_beginning(SPRITES_BUFFER_UNIFORM, fragment_sprites.to_vec());
-        uniform_buffer_manager.insert(CAMERA_BUFFER_UNIFORM, &buffers_resources.camera, 0);
+        uniform_buffer_manager.write_from_beginning(
+            BIND_GROUP_MAIN_BUFFERS,
+            SPRITES_BUFFER_UNIFORM,
+            fragment_sprites.to_vec(),
+        );
+        uniform_buffer_manager.insert(
+            BIND_GROUP_MAIN_BUFFERS,
+            CAMERA_BUFFER_UNIFORM,
+            &buffers_resources.camera,
+            0,
+        );
     }
 }

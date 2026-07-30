@@ -8,9 +8,11 @@ use crate::{
             managers::ManagersResource,
             state::{State, StateResource},
         },
-        CAMERA_BUFFER_UNIFORM, MAIN_SHADERS_ID, SPRITES_BUFFER_UNIFORM, SPRITES_RENDER_PIPELINE_ID,
+        BIND_GROUP_MAIN_BUFFERS, CAMERA_BUFFER_UNIFORM, MAIN_SHADERS_ID, SPRITES_BUFFER_UNIFORM,
+        SPRITES_RENDER_PIPELINE_ID,
     },
-    uniform::sprite::Sprite,
+    manager::uniform_buffer_manager::UniformBufferEntry,
+    uniform::{sprite::Sprite, UniformBufSize},
 };
 
 pub struct SceneLoader;
@@ -44,21 +46,30 @@ impl<'a> System<'a> for SceneLoader {
         let mut uniform_buffer_manager = inner_managers.uniform_buffer_manager.write().unwrap();
         uniform_buffer_manager.cleanup_all();
 
-        uniform_buffer_manager.create::<Sprite>(SPRITES_BUFFER_UNIFORM, 1024);
-        uniform_buffer_manager.create::<Mat4>(CAMERA_BUFFER_UNIFORM, 1);
+        let entries = vec![
+            UniformBufferEntry {
+                size_fn: Sprite::size_fn(),
+                buffer_name: SPRITES_BUFFER_UNIFORM.to_string(),
+                binding: 0,
+                items_count: 1024,
+            },
+            UniformBufferEntry {
+                size_fn: Mat4::size_fn(),
+                buffer_name: CAMERA_BUFFER_UNIFORM.to_string(),
+                binding: 1,
+                items_count: 1,
+            },
+        ];
+        uniform_buffer_manager.create(BIND_GROUP_MAIN_BUFFERS, entries);
 
         // prepare pipeline
-        let (_, sprites_buffer_uniform_bind_group_layout) = uniform_buffer_manager
-            .borrow_bind_group(SPRITES_BUFFER_UNIFORM)
-            .unwrap();
-        let (_, camera_buffer_uniform_bind_group_layout) = uniform_buffer_manager
-            .borrow_bind_group(CAMERA_BUFFER_UNIFORM)
+        let (_, main_buffers_uniform_bind_group_layout) = uniform_buffer_manager
+            .borrow_bind_group(BIND_GROUP_MAIN_BUFFERS)
             .unwrap();
 
         let bind_group_layouts = vec![
             tex_manager.borrow_bind_group_layout(),
-            sprites_buffer_uniform_bind_group_layout,
-            camera_buffer_uniform_bind_group_layout,
+            main_buffers_uniform_bind_group_layout,
         ];
         let mut pipeline_manager = inner_managers.pipeline_manager.write().unwrap();
         pipeline_manager
