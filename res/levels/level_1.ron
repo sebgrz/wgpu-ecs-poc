@@ -1,5 +1,7 @@
 (
     name: "Test",
+    triggers: {},
+    animations: [],
     entities: [
         // ENTITY 1: Player
         (

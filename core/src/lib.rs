@@ -5,7 +5,7 @@ use specs::{World, WorldExt};
 use crate::{
     ecs::{
         component::{
-            animation::Animation, player::Player, position::Position, size::Size,
+            animation::Animation, marker::Marker, player::Player, position::Position, size::Size,
             sprite_animation::SpriteAnimation, tile::Tile,
         },
         resource::{
@@ -40,6 +40,7 @@ pub fn init() -> (SharedRenderer, SharedWorld) {
     world.register::<Player>();
     world.register::<SpriteAnimation>();
     world.register::<Animation>();
+    world.register::<Marker>();
 
     (renderer.clone(), Arc::new(RwLock::new(world)))
 }

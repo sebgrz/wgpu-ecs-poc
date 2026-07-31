@@ -1,4 +1,6 @@
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+use serde::{Deserialize, Serialize};
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
 pub enum SpecialKey {
     LEFT,
     RIGHT,
@@ -9,7 +11,7 @@ pub enum SpecialKey {
     ESCAPE,
 }
 
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
 pub enum KeyType {
     SPECIAL(SpecialKey),
     CHAR(String),

@@ -1,3 +1,5 @@
+use crate::data::level::LevelData;
+
 #[derive(Default, PartialEq, Debug)]
 pub enum State {
     #[default]
@@ -9,4 +11,5 @@ pub enum State {
 pub struct StateResource {
     pub state: State,
     pub game_state: String,
+    pub level_data: Option<LevelData>,
 }

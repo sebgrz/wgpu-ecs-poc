@@ -10,8 +10,7 @@ use crate::{
             renderer::RendererResource,
             state::{State, StateResource},
         },
-        BIND_GROUP_MAIN_BUFFERS,
-        SPRITES_RENDER_PIPELINE_ID,
+        BIND_GROUP_MAIN_BUFFERS, SPRITES_RENDER_PIPELINE_ID,
     },
     manager::texture_manager::TextureObject,
 };
